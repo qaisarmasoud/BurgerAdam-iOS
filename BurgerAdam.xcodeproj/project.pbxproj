@@ -1,0 +1,257 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6FEFD542B3144743B0F0FD05 /* BurgerAdamApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11F16F75BB0C4C1EB6300057 /* BurgerAdamApp.swift */; };
+		6C7F36EB1CC9481D98AFFD07 /* MenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 081905283FA24817AC06F302 /* MenuItem.swift */; };
+		FE16F81D73034AE4B6408661 /* Order.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D60416EAD7D46E3ABA1D84D /* Order.swift */; };
+		E800645E0840429D8BC7FA88 /* Expense.swift in Sources */ = {isa = PBXBuildFile; fileRef = C83992789D9B44D3A69E7201 /* Expense.swift */; };
+		19A56530CE8F49EF93B3A9CB /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12E113D0E48C4090AEAC94E4 /* DataManager.swift */; };
+		6A14368232694D1B8174CA22 /* ReceiptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B13ED7F47FD4F7FAEEB09B7 /* ReceiptView.swift */; };
+		355B27033F2243618B5D82F9 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF058DD26AD7433B8DE2348D /* CartView.swift */; };
+		2570A2CEB5DD460DB6AF0849 /* CashierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6EACCCED647434AA2F309CB /* CashierView.swift */; };
+		6FC2CBE47DCD47C298198221 /* ExpensesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 63360971F59F47E3B8006740 /* ExpensesView.swift */; };
+		AC5FFDE64522430D83E6BC08 /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FBCAF2ABE8B4CACAA712ECD /* ReportsView.swift */; };
+		0225D0AC63BE4CD38F66503C /* SettingsAndBackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA580ED410A4582BD27ABAE /* SettingsAndBackupView.swift */; };
+		DD7903E7ADCF439EBEFC0AA6 /* MainiPadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 740976D9635E449BBDC4A84F /* MainiPadView.swift */; };
+		D962476299F04C70B59B3434 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C8D6DAA90C524D09951EBFEA /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		BC978D4E2365432ABFF6E89D /* BurgerAdam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BurgerAdam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		11F16F75BB0C4C1EB6300057 /* BurgerAdamApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/BurgerAdamApp.swift"; sourceTree = "<group>"; };
+		081905283FA24817AC06F302 /* MenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Models/MenuItem.swift"; sourceTree = "<group>"; };
+		8D60416EAD7D46E3ABA1D84D /* Order.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Models/Order.swift"; sourceTree = "<group>"; };
+		C83992789D9B44D3A69E7201 /* Expense.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Models/Expense.swift"; sourceTree = "<group>"; };
+		12E113D0E48C4090AEAC94E4 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Models/DataManager.swift"; sourceTree = "<group>"; };
+		2B13ED7F47FD4F7FAEEB09B7 /* ReceiptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/ReceiptView.swift"; sourceTree = "<group>"; };
+		EF058DD26AD7433B8DE2348D /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/CartView.swift"; sourceTree = "<group>"; };
+		C6EACCCED647434AA2F309CB /* CashierView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/CashierView.swift"; sourceTree = "<group>"; };
+		63360971F59F47E3B8006740 /* ExpensesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/ExpensesView.swift"; sourceTree = "<group>"; };
+		2FBCAF2ABE8B4CACAA712ECD /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/ReportsView.swift"; sourceTree = "<group>"; };
+		6BA580ED410A4582BD27ABAE /* SettingsAndBackupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/SettingsAndBackupView.swift"; sourceTree = "<group>"; };
+		740976D9635E449BBDC4A84F /* MainiPadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/MainiPadView.swift"; sourceTree = "<group>"; };
+		C8D6DAA90C524D09951EBFEA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = BurgerAdam/Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		22C9FDBBEBC84996BA086914 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		8505B6F066544510BE2F6BAD = {
+			isa = PBXGroup;
+			children = (
+				11F16F75BB0C4C1EB6300057 /* BurgerAdamApp.swift */,
+				081905283FA24817AC06F302 /* MenuItem.swift */,
+				8D60416EAD7D46E3ABA1D84D /* Order.swift */,
+				C83992789D9B44D3A69E7201 /* Expense.swift */,
+				12E113D0E48C4090AEAC94E4 /* DataManager.swift */,
+				2B13ED7F47FD4F7FAEEB09B7 /* ReceiptView.swift */,
+				EF058DD26AD7433B8DE2348D /* CartView.swift */,
+				C6EACCCED647434AA2F309CB /* CashierView.swift */,
+				63360971F59F47E3B8006740 /* ExpensesView.swift */,
+				2FBCAF2ABE8B4CACAA712ECD /* ReportsView.swift */,
+				6BA580ED410A4582BD27ABAE /* SettingsAndBackupView.swift */,
+				740976D9635E449BBDC4A84F /* MainiPadView.swift */,
+				C8D6DAA90C524D09951EBFEA /* Assets.xcassets */,
+				BC978D4E2365432ABFF6E89D /* BurgerAdam.app */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4D79200718064340A7880F64 /* BurgerAdam */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE2372ADC0664CF9975CB98B /* Build configuration list for PBXNativeTarget "BurgerAdam" */;
+			buildPhases = (
+				A43680ACEF1D4C2DBCCB49A7 /* Sources */,
+				22C9FDBBEBC84996BA086914 /* Frameworks */,
+				320C2D6F999A4460ACED68B2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BurgerAdam;
+			productName = BurgerAdam;
+			productReference = BC978D4E2365432ABFF6E89D /* BurgerAdam.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A692890EA7104F8E93D46146 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1400;
+				LastUpgradeCheck = 1400;
+				TargetAttributes = {
+					4D79200718064340A7880F64 = {
+						CreatedOnToolsVersion = 14.0;
+					};
+				};
+			};
+			buildConfigurationList = CC4AF1301F4C46D4B1D769AE /* Build configuration list for PBXProject "BurgerAdam" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = ar;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				ar,
+				en,
+				Base,
+			);
+			mainGroup = 8505B6F066544510BE2F6BAD;
+			productRefGroup = 8505B6F066544510BE2F6BAD;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4D79200718064340A7880F64 /* BurgerAdam */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		320C2D6F999A4460ACED68B2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D962476299F04C70B59B3434 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A43680ACEF1D4C2DBCCB49A7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6FEFD542B3144743B0F0FD05 /* BurgerAdamApp.swift in Sources */,
+				6C7F36EB1CC9481D98AFFD07 /* MenuItem.swift in Sources */,
+				FE16F81D73034AE4B6408661 /* Order.swift in Sources */,
+				E800645E0840429D8BC7FA88 /* Expense.swift in Sources */,
+				19A56530CE8F49EF93B3A9CB /* DataManager.swift in Sources */,
+				6A14368232694D1B8174CA22 /* ReceiptView.swift in Sources */,
+				355B27033F2243618B5D82F9 /* CartView.swift in Sources */,
+				2570A2CEB5DD460DB6AF0849 /* CashierView.swift in Sources */,
+				6FC2CBE47DCD47C298198221 /* ExpensesView.swift in Sources */,
+				AC5FFDE64522430D83E6BC08 /* ReportsView.swift in Sources */,
+				0225D0AC63BE4CD38F66503C /* SettingsAndBackupView.swift in Sources */,
+				DD7903E7ADCF439EBEFC0AA6 /* MainiPadView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		55F138E195894FEEA9665662 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				ENABLE_TESTABILITY = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		77CC2078AA2649C68BB6F397 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F0053CC0F1DC4763A5F46AFE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Manual;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BurgerAdam/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.burgeradam.pos;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		98D0299F3ABA417FBCB33FBD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Manual;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_IDENTITY = "";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = BurgerAdam/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.burgeradam.pos;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CC4AF1301F4C46D4B1D769AE /* Build configuration list for PBXProject "BurgerAdam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				55F138E195894FEEA9665662 /* Debug */,
+				77CC2078AA2649C68BB6F397 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CE2372ADC0664CF9975CB98B /* Build configuration list for PBXNativeTarget "BurgerAdam" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F0053CC0F1DC4763A5F46AFE /* Debug */,
+				98D0299F3ABA417FBCB33FBD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = A692890EA7104F8E93D46146 /* Project object */;
+}
