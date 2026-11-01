@@ -18,17 +18,37 @@ public struct OrderItem: Identifiable, Codable, Equatable {
     public var name: String
     public var unitPrice: Int
     public var quantity: Int
+    public var selectedAddOns: [CustomAddOn]
+    public var selectedPreferences: [String]
 
-    public init(id: UUID = UUID(), menuItemId: UUID, name: String, unitPrice: Int, quantity: Int = 1) {
+    public init(
+        id: UUID = UUID(),
+        menuItemId: UUID,
+        name: String,
+        unitPrice: Int,
+        quantity: Int = 1,
+        selectedAddOns: [CustomAddOn] = [],
+        selectedPreferences: [String] = []
+    ) {
         self.id = id
         self.menuItemId = menuItemId
         self.name = name
         self.unitPrice = unitPrice
         self.quantity = quantity
+        self.selectedAddOns = selectedAddOns
+        self.selectedPreferences = selectedPreferences
+    }
+
+    public var addOnsTotal: Int {
+        selectedAddOns.reduce(0) { $0 + $1.price }
+    }
+
+    public var singleItemTotal: Int {
+        unitPrice + addOnsTotal
     }
 
     public var totalPrice: Int {
-        unitPrice * quantity
+        singleItemTotal * quantity
     }
 }
 

@@ -28,7 +28,7 @@ public struct MainiPadView: View {
                         Text("بركر ادم")
                             .font(.system(size: 20, weight: .black))
                             .foregroundColor(.white)
-                        Text("نظام الكاشير والمصاريف والأرباح")
+                        Text("نظام الكاشير وإدارة القاصة والأرباح")
                             .font(.system(size: 11, weight: .bold))
                             .foregroundColor(Color.white.opacity(0.75))
                     }
@@ -66,18 +66,21 @@ public struct MainiPadView: View {
                 TabButton(title: "المصاريف والنفقات", icon: "banknote.fill", isSelected: selectedTab == 1) {
                     withAnimation { selectedTab = 1 }
                 }
-                TabButton(title: "الأرباح والتقارير", icon: "chart.pie.fill", isSelected: selectedTab == 2) {
+                TabButton(title: "إغلاق القاصة Z-Report", icon: "lock.shield.fill", isSelected: selectedTab == 2) {
                     withAnimation { selectedTab = 2 }
                 }
-                TabButton(title: "المنيو والنسخ الاحتياطي", icon: "gearshape.fill", isSelected: selectedTab == 3) {
+                TabButton(title: "الأرباح والإحصائيات", icon: "chart.pie.fill", isSelected: selectedTab == 3) {
                     withAnimation { selectedTab = 3 }
+                }
+                TabButton(title: "المنيو والنسخ", icon: "gearshape.fill", isSelected: selectedTab == 4) {
+                    withAnimation { selectedTab = 4 }
                 }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
             .background(Color(UIColor.secondarySystemBackground))
 
-            // الصفحات
+            // محتوى الصفحات
             ZStack {
                 switch selectedTab {
                 case 0:
@@ -85,8 +88,10 @@ public struct MainiPadView: View {
                 case 1:
                     ExpensesView(dataManager: dataManager)
                 case 2:
-                    ReportsView(dataManager: dataManager)
+                    ZReportView(dataManager: dataManager)
                 case 3:
+                    ReportsView(dataManager: dataManager)
+                case 4:
                     SettingsAndBackupView(dataManager: dataManager)
                 default:
                     CashierView(dataManager: dataManager)
@@ -96,31 +101,5 @@ public struct MainiPadView: View {
         }
         .environment(\.layoutDirection, .rightToLeft)
         .ignoresSafeArea(.keyboard, edges: .bottom)
-    }
-}
-
-// زر التبويب المخصص للآيباد
-struct TabButton: View {
-    let title: String
-    let icon: String
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 8) {
-                Image(systemName: icon)
-                    .font(.system(size: 15, weight: .bold))
-                Text(title)
-                    .font(.system(size: 14, weight: .bold))
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
-            .background(isSelected ? Color(red: 15/255, green: 23/255, blue: 42/255) : Color(UIColor.systemBackground))
-            .foregroundColor(isSelected ? .white : .primary)
-            .cornerRadius(12)
-            .shadow(color: Color.black.opacity(isSelected ? 0.12 : 0.03), radius: 4, x: 0, y: 2)
-        }
-        .buttonStyle(PlainButtonStyle())
     }
 }

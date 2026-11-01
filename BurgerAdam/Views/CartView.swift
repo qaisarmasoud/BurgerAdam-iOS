@@ -2,23 +2,14 @@ import SwiftUI
 
 public struct CartView: View {
     @ObservedObject var dataManager: DataManager
-    @Binding var cartItems: [UUID: Int] // MenuItem ID -> Quantity
+    @Binding var cartItems: [OrderItem]
     @State private var orderNote = ""
     @State private var orderType: OrderType = .takeaway
     @State private var paymentMethod: PaymentMethod = .cash
     @State private var completedOrder: Order?
-    @State private var showReceipt = false
-    @State private var showEmptyAlert = false
-
-    private var itemsList: [(item: MenuItem, qty: Int)] {
-        cartItems.compactMap { (id, qty) in
-            guard qty > 0, let menuItem = dataManager.menuItems.first(where: { $0.id == id }) else { return nil }
-            return (menuItem, qty)
-        }.sorted { $0.item.name < $1.item.name }
-    }
 
     private var totalAmount: Int {
-        itemsList.reduce(0) { $0 + ($1.item.price * $1.qty) }
+        cartItems.reduce(0) { $0 + $1.totalPrice }
     }
 
     public var body: some View {
@@ -28,7 +19,7 @@ public struct CartView: View {
                 Text("الطلب الحالي")
                     .font(.system(size: 20, weight: .bold))
                 Spacer()
-                if !itemsList.isEmpty {
+                if !cartItems.isEmpty {
                     Button(action: {
                         withAnimation { cartItems.removeAll() }
                     }) {
@@ -47,7 +38,7 @@ public struct CartView: View {
 
             Divider()
 
-            if itemsList.isEmpty {
+            if cartItems.isEmpty {
                 VStack(spacing: 12) {
                     Spacer()
                     Image(systemName: "cart.badge.plus")
@@ -56,7 +47,7 @@ public struct CartView: View {
                     Text("السلة فارغة")
                         .font(.system(size: 17, weight: .bold))
                         .foregroundColor(.secondary)
-                    Text("اضغط على أي وجبة أو مشروب من القائمة لإضافتها للطلب")
+                    Text("اضغط على أي وجبة لتخصيص الإضافات وإضافتها للطلب")
                         .font(.system(size: 13))
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -65,53 +56,76 @@ public struct CartView: View {
                 }
             } else {
                 List {
-                    ForEach(itemsList, id: \.item.id) { pair in
-                        HStack(spacing: 12) {
-                            Text(pair.item.emoji)
-                                .font(.system(size: 26))
-                                .frame(width: 36, height: 36)
-                                .background(Color(UIColor.systemBackground))
-                                .cornerRadius(8)
-
-                            VStack(alignment: .leading, spacing: 3) {
-                                Text(pair.item.name)
+                    ForEach(Array(cartItems.enumerated()), id: \.element.id) { index, item in
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text(item.name)
                                     .font(.system(size: 15, weight: .bold))
-                                Text(DataManager.formatMoney(pair.item.price * pair.qty))
-                                    .font(.system(size: 13, weight: .semibold))
+                                Spacer()
+                                Text(DataManager.formatMoney(item.totalPrice))
+                                    .font(.system(size: 14, weight: .black))
                                     .foregroundColor(.green)
                             }
 
-                            Spacer()
-
-                            // أزرار التحكم بالكمية
-                            HStack(spacing: 8) {
-                                Button(action: {
-                                    withAnimation {
-                                        let current = cartItems[pair.item.id] ?? 0
-                                        if current <= 1 {
-                                            cartItems.removeValue(forKey: pair.item.id)
-                                        } else {
-                                            cartItems[pair.item.id] = current - 1
-                                        }
-                                    }
-                                }) {
-                                    Image(systemName: "minus.circle.fill")
-                                        .font(.system(size: 22))
-                                        .foregroundColor(.red.opacity(0.8))
+                            // عرض الإضافات والرغبات
+                            if !item.selectedAddOns.isEmpty {
+                                HStack(spacing: 4) {
+                                    Text("إضافات:")
+                                        .font(.system(size: 11, weight: .bold))
+                                        .foregroundColor(.orange)
+                                    Text(item.selectedAddOns.map { "\($0.name) (+\($0.price))" }.joined(separator: " ، "))
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.secondary)
                                 }
+                            }
 
-                                Text("\(pair.qty)")
-                                    .font(.system(size: 16, weight: .bold))
-                                    .frame(minWidth: 24)
+                            if !item.selectedPreferences.isEmpty {
+                                HStack(spacing: 4) {
+                                    Text("تفضيلات:")
+                                        .font(.system(size: 11, weight: .bold))
+                                        .foregroundColor(.blue)
+                                    Text(item.selectedPreferences.joined(separator: " ، "))
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.secondary)
+                                }
+                            }
 
-                                Button(action: {
-                                    withAnimation {
-                                        cartItems[pair.item.id] = (cartItems[pair.item.id] ?? 0) + 1
+                            HStack {
+                                Text("السعر الفردي: \(DataManager.formatMoney(item.singleItemTotal))")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(.secondary)
+
+                                Spacer()
+
+                                // أزرار الكمية
+                                HStack(spacing: 10) {
+                                    Button(action: {
+                                        withAnimation {
+                                            if cartItems[index].quantity > 1 {
+                                                cartItems[index].quantity -= 1
+                                            } else {
+                                                cartItems.remove(at: index)
+                                            }
+                                        }
+                                    }) {
+                                        Image(systemName: "minus.circle.fill")
+                                            .font(.system(size: 22))
+                                            .foregroundColor(.red.opacity(0.8))
                                     }
-                                }) {
-                                    Image(systemName: "plus.circle.fill")
-                                        .font(.system(size: 22))
-                                        .foregroundColor(.green)
+
+                                    Text("\(item.quantity)")
+                                        .font(.system(size: 16, weight: .bold))
+                                        .frame(minWidth: 20)
+
+                                    Button(action: {
+                                        withAnimation {
+                                            cartItems[index].quantity += 1
+                                        }
+                                    }) {
+                                        Image(systemName: "plus.circle.fill")
+                                            .font(.system(size: 22))
+                                            .foregroundColor(.green)
+                                    }
                                 }
                             }
                         }
@@ -120,9 +134,8 @@ public struct CartView: View {
                 }
                 .listStyle(PlainListStyle())
 
-                // قسم الخيارات والدفع
+                // خيارات الدفع والطلب
                 VStack(spacing: 12) {
-                    // اختيار نوع الطلب
                     Picker("نوع الطلب", selection: $orderType) {
                         ForEach(OrderType.allCases, id: \.self) { type in
                             Text(type.rawValue).tag(type)
@@ -130,7 +143,6 @@ public struct CartView: View {
                     }
                     .pickerStyle(SegmentedPickerStyle())
 
-                    // اختيار طريقة الدفع
                     Picker("طريقة الدفع", selection: $paymentMethod) {
                         ForEach(PaymentMethod.allCases, id: \.self) { method in
                             Text(method.rawValue).tag(method)
@@ -138,25 +150,21 @@ public struct CartView: View {
                     }
                     .pickerStyle(SegmentedPickerStyle())
 
-                    // ملاحظات الطلب
-                    TextField("ملاحظة (مثال: بدون بصل، زيادة مايونيز)", text: $orderNote)
+                    TextField("ملاحظات إضافية على الطلب...", text: $orderNote)
                         .padding(10)
                         .background(Color(UIColor.secondarySystemBackground))
                         .cornerRadius(10)
                         .font(.system(size: 14))
 
-                    // شريط المجموع
                     HStack {
-                        Text("المجموع المطلوب:")
+                        Text("المجموع النهائي:")
                             .font(.system(size: 16, weight: .bold))
                         Spacer()
                         Text(DataManager.formatMoney(totalAmount))
                             .font(.system(size: 22, weight: .black))
                             .foregroundColor(.green)
                     }
-                    .padding(.top, 4)
 
-                    // زر تسجيل البيع
                     Button(action: completeSale) {
                         HStack {
                             Image(systemName: "checkmark.circle.fill")
@@ -183,17 +191,13 @@ public struct CartView: View {
     }
 
     private func completeSale() {
-        guard !itemsList.isEmpty else { return }
-        let orderItems = itemsList.map { pair in
-            OrderItem(menuItemId: pair.item.id, name: pair.item.name, unitPrice: pair.item.price, quantity: pair.qty)
-        }
+        guard !cartItems.isEmpty else { return }
         let order = dataManager.addOrder(
-            items: orderItems,
+            items: cartItems,
             note: orderNote.trimmingCharacters(in: .whitespacesAndNewlines),
             orderType: orderType,
             paymentMethod: paymentMethod
         )
-        // تفريغ السلة وتصفير الملاحظة
         cartItems.removeAll()
         orderNote = ""
         completedOrder = order

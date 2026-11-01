@@ -2,15 +2,23 @@ import Foundation
 import SwiftUI
 import Combine
 
+public struct ShiftInfo: Codable {
+    public var isOpen: Bool
+    public var cashierName: String
+    public var startTime: Date
+    public var startingCash: Int // القاصة الافتتاحية
+}
+
 public class DataManager: ObservableObject {
     @Published public var menuItems: [MenuItem] = []
     @Published public var orders: [Order] = []
     @Published public var expenses: [Expense] = []
-    @Published public var lastSavedText: String = "تم الحفظ"
+    @Published public var currentShift: ShiftInfo = ShiftInfo(isOpen: true, cashierName: "كاشير 1", startTime: Date(), startingCash: 50000)
     
     private let menuFileName = "adam_menu.json"
     private let ordersFileName = "adam_orders.json"
     private let expensesFileName = "adam_expenses.json"
+    private let shiftFileName = "adam_shift.json"
 
     public init() {
         loadAllData()
@@ -29,7 +37,7 @@ public class DataManager: ObservableObject {
     }
 
     public func loadAllData() {
-        // تحميل المنيو
+        // المنيو
         let menuURL = documentsDirectory.appendingPathComponent(menuFileName)
         if let data = try? Data(contentsOf: menuURL),
            let decoded = try? JSONDecoder().decode([MenuItem].self, from: data) {
@@ -39,7 +47,7 @@ public class DataManager: ObservableObject {
             saveMenu()
         }
 
-        // تحميل الطلبات
+        // الطلبات
         let ordersURL = documentsDirectory.appendingPathComponent(ordersFileName)
         if let data = try? Data(contentsOf: ordersURL),
            let decoded = try? JSONDecoder().decode([Order].self, from: data) {
@@ -48,13 +56,20 @@ public class DataManager: ObservableObject {
             self.orders = []
         }
 
-        // تحميل المصاريف
+        // المصاريف
         let expensesURL = documentsDirectory.appendingPathComponent(expensesFileName)
         if let data = try? Data(contentsOf: expensesURL),
            let decoded = try? JSONDecoder().decode([Expense].self, from: data) {
             self.expenses = decoded
         } else {
             self.expenses = []
+        }
+
+        // الشفت
+        let shiftURL = documentsDirectory.appendingPathComponent(shiftFileName)
+        if let data = try? Data(contentsOf: shiftURL),
+           let decoded = try? JSONDecoder().decode(ShiftInfo.self, from: data) {
+            self.currentShift = decoded
         }
     }
 
@@ -76,6 +91,13 @@ public class DataManager: ObservableObject {
         let expensesURL = documentsDirectory.appendingPathComponent(expensesFileName)
         if let encoded = try? JSONEncoder().encode(expenses) {
             try? encoded.write(to: expensesURL)
+        }
+    }
+
+    public func saveShift() {
+        let shiftURL = documentsDirectory.appendingPathComponent(shiftFileName)
+        if let encoded = try? JSONEncoder().encode(currentShift) {
+            try? encoded.write(to: shiftURL)
         }
     }
 
@@ -128,7 +150,7 @@ public class DataManager: ObservableObject {
         saveMenu()
     }
 
-    // إحصائيات اليوم المحدد
+    // فلترة التواريخ
     public func orders(for date: Date) -> [Order] {
         let calendar = Calendar.current
         return orders.filter { calendar.isDate($0.date, inSameDayAs: date) }
@@ -151,6 +173,87 @@ public class DataManager: ObservableObject {
         totalSales(for: date) - totalExpenses(for: date)
     }
 
+    // إحصائيات طرق الدفع لليوم
+    public func salesByPaymentMethod(for date: Date) -> (cash: Int, zainCash: Int, card: Int) {
+        let dayOrders = orders(for: date)
+        var cash = 0
+        var zainCash = 0
+        var card = 0
+        for o in dayOrders {
+            switch o.paymentMethod {
+            case .cash: cash += o.total
+            case .zainCash: zainCash += o.total
+            case .card: card += o.total
+            }
+        }
+        return (cash, zainCash, card)
+    }
+
+    // إحصائيات الأصناف الأكثر مبيعاً
+    public func topSellingItems(for date: Date) -> [(name: String, qty: Int, total: Int)] {
+        let dayOrders = orders(for: date)
+        var counts: [String: (qty: Int, total: Int)] = [:]
+        for o in dayOrders {
+            for i in o.items {
+                let existing = counts[i.name] ?? (0, 0)
+                counts[i.name] = (existing.qty + i.quantity, existing.total + i.totalPrice)
+            }
+        }
+        return counts.map { (name: $0.key, qty: $0.value.qty, total: $0.value.total) }
+            .sorted { $0.qty > $1.qty }
+    }
+
+    // إحصائيات المبيعات بالساعات (ساعات الذروة)
+    public func hourlySales(for date: Date) -> [(hour: Int, total: Int, count: Int)] {
+        let dayOrders = orders(for: date)
+        var hoursMap: [Int: (total: Int, count: Int)] = [:]
+        let calendar = Calendar.current
+        for h in 10...23 { // من 10 صباحاً لـ 11 ليلاً
+            hoursMap[h] = (0, 0)
+        }
+        for o in dayOrders {
+            let h = calendar.component(.hour, from: o.date)
+            let curr = hoursMap[h] ?? (0, 0)
+            hoursMap[h] = (curr.total + o.total, curr.count + 1)
+        }
+        return hoursMap.map { (hour: $0.key, total: $0.value.total, count: $0.value.count) }
+            .sorted { $0.hour < $1.hour }
+    }
+
+    // بدء وإغلاق الشفت (Z-Report)
+    public func startNewShift(cashierName: String, startingCash: Int) {
+        currentShift = ShiftInfo(isOpen: true, cashierName: cashierName, startTime: Date(), startingCash: startingCash)
+        saveShift()
+    }
+
+    public func shiftExpectedCash() -> Int {
+        let todayOrders = orders(for: Date())
+        let cashSales = todayOrders.filter { $0.paymentMethod == .cash }.reduce(0) { $0 + $1.total }
+        let dayExpenses = totalExpenses(for: Date())
+        return currentShift.startingCash + cashSales - dayExpenses
+    }
+
+    // تصدير ملف Excel / CSV
+    public func exportCSVURL() -> URL? {
+        var csv = "رقم الطلب,التاريخ,الوقت,نوع الطلب,طريقة الدفع,الأصناف,الملاحظات,المجموع بالدينار\n"
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        let timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "HH:mm"
+
+        for o in orders {
+            let d = dateFormatter.string(from: o.date)
+            let t = timeFormatter.string(from: o.date)
+            let itemsStr = o.items.map { "\($0.name) x\($0.quantity)" }.joined(separator: " + ")
+            let cleanNote = o.note.replacingOccurrences(of: ",", with: " ")
+            csv += "\(o.orderNumber),\(d),\(t),\(o.orderType.rawValue),\(o.paymentMethod.rawValue),\"\(itemsStr)\",\"\(cleanNote)\",\(o.total)\n"
+        }
+
+        let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("تقرير_مبيعات_بركر_ادم.csv")
+        try? csv.write(to: tempURL, atomically: true, encoding: .utf8)
+        return tempURL
+    }
+
     // تصدير واستيراد النسخة الاحتياطية
     public struct BackupData: Codable {
         public var app: String
@@ -164,7 +267,7 @@ public class DataManager: ObservableObject {
     public func exportBackupURL() -> URL? {
         let backup = BackupData(
             app: "بركر ادم",
-            version: 2,
+            version: 3,
             exportedAt: Date(),
             menu: menuItems,
             orders: orders,

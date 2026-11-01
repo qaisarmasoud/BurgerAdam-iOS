@@ -4,6 +4,8 @@ public struct ReportsView: View {
     @ObservedObject var dataManager: DataManager
     @State private var selectedDate: Date = Date()
     @State private var selectedOrderForReceipt: Order?
+    @State private var csvURL: URL?
+    @State private var showingCSVShare = false
 
     private var dayOrders: [Order] {
         dataManager.orders(for: selectedDate)
@@ -21,19 +23,46 @@ public struct ReportsView: View {
         dataManager.netProfit(for: selectedDate)
     }
 
+    private var topItems: [(name: String, qty: Int, total: Int)] {
+        dataManager.topSellingItems(for: selectedDate)
+    }
+
+    private var hourlyData: [(hour: Int, total: Int, count: Int)] {
+        dataManager.hourlySales(for: selectedDate)
+    }
+
+    private var maxHourlyTotal: Int {
+        max(hourlyData.map { $0.total }.max() ?? 1, 1)
+    }
+
     public var body: some View {
         ScrollView {
             VStack(spacing: 20) {
-                // شريط اختيار التاريخ
+                // شريط اختيار التاريخ وأزرار التصدير
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("تقرير الأرباح والمبيعات")
-                            .font(.system(size: 22, weight: .bold))
-                        Text("اختر أي تاريخ لعرض ملخص المبيعات والمصاريف وصافي الربح")
+                        Text("التقارير والإحصائيات الذكية")
+                            .font(.system(size: 22, weight: .black))
+                        Text("تحليلات المبيعات، ساعات الذروة، والوجبات الأكثر طلباً")
                             .font(.system(size: 13))
                             .foregroundColor(.secondary)
                     }
                     Spacer()
+
+                    // زر تصدير Excel CSV
+                    Button(action: exportCSV) {
+                        HStack {
+                            Image(systemName: "tablecells.badge.ellipsis")
+                            Text("تصدير إكسل (CSV)")
+                        }
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(.green)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.green.opacity(0.12))
+                        .cornerRadius(10)
+                    }
+
                     DatePicker("التاريخ", selection: $selectedDate, displayedComponents: .date)
                         .labelsHidden()
                         .padding(8)
@@ -49,7 +78,7 @@ public struct ReportsView: View {
                     StatCard(
                         title: "إجمالي المبيعات",
                         value: DataManager.formatMoney(daySales),
-                        subtitle: "\(dayOrders.count) طلبات",
+                        subtitle: "\(dayOrders.count) طلبات اليوم",
                         icon: "bag.fill",
                         color: .green
                     )
@@ -57,7 +86,7 @@ public struct ReportsView: View {
                     StatCard(
                         title: "إجمالي المصاريف",
                         value: DataManager.formatMoney(dayExpenses),
-                        subtitle: "\(dataManager.expenses(for: selectedDate).count) مصروفات",
+                        subtitle: "\(dataManager.expenses(for: selectedDate).count) بنود مصروفات",
                         icon: "arrow.down.right.circle.fill",
                         color: .red
                     )
@@ -65,13 +94,101 @@ public struct ReportsView: View {
                     StatCard(
                         title: "صافي الأرباح",
                         value: DataManager.formatMoney(dayNetProfit),
-                        subtitle: dayNetProfit >= 0 ? "أرباح إيجابية 🎉" : "عجز مالي",
+                        subtitle: dayNetProfit >= 0 ? "أرباح ممتازة 🎉" : "عجز مالي",
                         icon: dayNetProfit >= 0 ? "chart.line.uptrend.xyaxis" : "chart.line.downtrend.xyaxis",
                         color: dayNetProfit >= 0 ? .green : .red
                     )
                 }
 
-                // تفاصيل مبيعات اليوم
+                // قسم الرسوم البيانية الذكية (ساعات الذروة + الأصناف الأكثر مبيعاً)
+                HStack(alignment: .top, spacing: 14) {
+                    // مخطط ساعات الذروة (Peak Hours)
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Image(systemName: "clock.arrow.circlepath")
+                                .foregroundColor(.blue)
+                            Text("ساعات الذروة (توزيع المبيعات)")
+                                .font(.system(size: 16, weight: .bold))
+                        }
+
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(alignment: .bottom, spacing: 10) {
+                                ForEach(hourlyData, id: \.hour) { h in
+                                    VStack(spacing: 6) {
+                                        let heightFraction = CGFloat(h.total) / CGFloat(maxHourlyTotal)
+                                        let barHeight = max(heightFraction * 110, 4)
+
+                                        ZStack(alignment: .bottom) {
+                                            RoundedRectangle(cornerRadius: 6)
+                                                .fill(h.total > 0 ? Color.blue : Color(UIColor.secondarySystemBackground))
+                                                .frame(width: 24, height: barHeight)
+                                        }
+
+                                        Text("\(h.hour):00")
+                                            .font(.system(size: 10, weight: .bold))
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                            }
+                            .padding(.vertical, 8)
+                        }
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(UIColor.systemBackground))
+                    .cornerRadius(16)
+
+                    // قائمة الوجبات الأكثر مبيعاً (Top Sellers)
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Image(systemName: "crown.fill")
+                                .foregroundColor(.orange)
+                            Text("الوجبات الأكثر مبيعاً")
+                                .font(.system(size: 16, weight: .bold))
+                        }
+
+                        if topItems.isEmpty {
+                            Text("لا توجد مبيعات بهذا التاريخ")
+                                .font(.system(size: 13))
+                                .foregroundColor(.secondary)
+                                .padding(.vertical, 20)
+                        } else {
+                            VStack(spacing: 8) {
+                                ForEach(Array(topItems.prefix(5).enumerated()), id: \.element.name) { rank, item in
+                                    HStack {
+                                        Text("#\(rank + 1)")
+                                            .font(.system(size: 12, weight: .black))
+                                            .foregroundColor(rank == 0 ? .orange : .secondary)
+                                            .frame(width: 24)
+
+                                        Text(item.name)
+                                            .font(.system(size: 14, weight: .bold))
+
+                                        Spacer()
+
+                                        Text("\(item.qty) وجبة")
+                                            .font(.system(size: 12, weight: .bold))
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 3)
+                                            .background(Color.green.opacity(0.12))
+                                            .foregroundColor(.green)
+                                            .cornerRadius(6)
+
+                                        Text(DataManager.formatMoney(item.total))
+                                            .font(.system(size: 13, weight: .bold))
+                                    }
+                                    .padding(.vertical, 2)
+                                }
+                            }
+                        }
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color(UIColor.systemBackground))
+                    .cornerRadius(16)
+                }
+
+                // سجل طلبات اليوم
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
                         Text("سجل طلبات اليوم المحدد")
@@ -109,6 +226,13 @@ public struct ReportsView: View {
                                                 .background(Color.orange.opacity(0.12))
                                                 .foregroundColor(.orange)
                                                 .cornerRadius(6)
+                                            Text(order.paymentMethod.rawValue)
+                                                .font(.system(size: 11, weight: .bold))
+                                                .padding(.horizontal, 6)
+                                                .padding(.vertical, 2)
+                                                .background(Color.green.opacity(0.12))
+                                                .foregroundColor(.green)
+                                                .cornerRadius(6)
                                         }
 
                                         Text(order.items.map { "\($0.name) × \($0.quantity)" }.joined(separator: " ، "))
@@ -129,7 +253,6 @@ public struct ReportsView: View {
                                         .foregroundColor(.green)
                                         .padding(.trailing, 10)
 
-                                    // زر الفاتورة
                                     Button(action: {
                                         selectedOrderForReceipt = order
                                     }) {
@@ -140,7 +263,6 @@ public struct ReportsView: View {
                                             .cornerRadius(8)
                                     }
 
-                                    // زر الحذف
                                     Button(action: {
                                         withAnimation {
                                             dataManager.deleteOrder(id: order.id)
@@ -168,42 +290,17 @@ public struct ReportsView: View {
         .sheet(item: $selectedOrderForReceipt) { order in
             ReceiptView(order: order)
         }
-    }
-}
-
-// بطاقة إحصاء ملونة
-struct StatCard: View {
-    let title: String
-    let value: String
-    let subtitle: String
-    let icon: String
-    let color: Color
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(title)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(.secondary)
-                Spacer()
-                Image(systemName: icon)
-                    .foregroundColor(color)
-                    .font(.system(size: 20))
+        .sheet(isPresented: $showingCSVShare) {
+            if let url = csvURL {
+                ShareSheet(activityItems: [url])
             }
-
-            Text(value)
-                .font(.system(size: 22, weight: .black))
-                .foregroundColor(color)
-                .minimumScaleFactor(0.8)
-                .lineLimit(1)
-
-            Text(subtitle)
-                .font(.system(size: 12))
-                .foregroundColor(.secondary)
         }
-        .padding(16)
-        .background(Color(UIColor.systemBackground))
-        .cornerRadius(14)
-        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
+    }
+
+    private func exportCSV() {
+        if let url = dataManager.exportCSVURL() {
+            csvURL = url
+            showingCSVShare = true
+        }
     }
 }

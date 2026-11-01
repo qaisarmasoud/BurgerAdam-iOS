@@ -31,6 +31,8 @@ def generate_pbxproj():
         ("ExpensesView.swift", "BurgerAdam/Views/ExpensesView.swift"),
         ("ReportsView.swift", "BurgerAdam/Views/ReportsView.swift"),
         ("SettingsAndBackupView.swift", "BurgerAdam/Views/SettingsAndBackupView.swift"),
+        ("ItemCustomizerView.swift", "BurgerAdam/Views/ItemCustomizerView.swift"),
+        ("ZReportView.swift", "BurgerAdam/Views/ZReportView.swift"),
         ("MainiPadView.swift", "BurgerAdam/Views/MainiPadView.swift")
     ]
 
