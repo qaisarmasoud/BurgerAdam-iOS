@@ -304,3 +304,49 @@ public struct ReportsView: View {
         }
     }
 }
+
+
+// بطاقة إحصاء ملونة
+public struct StatCard: View {
+    public let title: String
+    public let value: String
+    public let subtitle: String
+    public let icon: String
+    public let color: Color
+
+    public init(title: String, value: String, subtitle: String, icon: String, color: Color) {
+        self.title = title
+        self.value = value
+        self.subtitle = subtitle
+        self.icon = icon
+        self.color = color
+    }
+
+    public var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text(title)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.secondary)
+                Spacer()
+                Image(systemName: icon)
+                    .foregroundColor(color)
+                    .font(.system(size: 20))
+            }
+
+            Text(value)
+                .font(.system(size: 22, weight: .black))
+                .foregroundColor(color)
+                .minimumScaleFactor(0.8)
+                .lineLimit(1)
+
+            Text(subtitle)
+                .font(.system(size: 12))
+                .foregroundColor(.secondary)
+        }
+        .padding(16)
+        .background(Color(UIColor.systemBackground))
+        .cornerRadius(14)
+        .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
+    }
+}
