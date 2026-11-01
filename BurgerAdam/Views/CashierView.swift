@@ -3,9 +3,8 @@ import SwiftUI
 public struct CashierView: View {
     @ObservedObject var dataManager: DataManager
     @State private var selectedCategory: String = "الكل"
-    @State private var cartItems: [OrderItem] = []
+    @State private var cartItems: [UUID: Int] = [:]
     @State private var searchText: String = ""
-    @State private var selectedItemForCustomization: MenuItem?
 
     private var categories: [String] {
         var list = ["الكل"]
@@ -22,6 +21,7 @@ public struct CashierView: View {
         }
     }
 
+    // شبكة أعمدة مخصصة للآيباد (LazyVGrid)
     private let columns = [
         GridItem(.adaptive(minimum: 150, maximum: 200), spacing: 14)
     ]
@@ -79,11 +79,12 @@ public struct CashierView: View {
                 ScrollView {
                     LazyVGrid(columns: columns, spacing: 14) {
                         ForEach(filteredItems) { item in
-                            let countInCart = cartItems.filter { $0.menuItemId == item.id }.reduce(0) { $0 + $1.quantity }
-                            MenuItemCard(item: item, cartQty: countInCart) {
-                                // فتح نافذة التخصيص
-                                selectedItemForCustomization = item
-                                let generator = UIImpactFeedbackGenerator(style: .medium)
+                            MenuItemCard(item: item, cartQty: cartItems[item.id] ?? 0) {
+                                // إضافة للسلة مع اهتزاز لمسي
+                                withAnimation(.spring(response: 0.25, dampingFraction: 0.6)) {
+                                    cartItems[item.id] = (cartItems[item.id] ?? 0) + 1
+                                }
+                                let generator = UIImpactFeedbackGenerator(style: .light)
                                 generator.impactOccurred()
                             }
                         }
@@ -97,16 +98,9 @@ public struct CashierView: View {
 
             // القسم الجانبي: السلة والدفع (شاشة مقسومة للآيباد)
             CartView(dataManager: dataManager, cartItems: $cartItems)
-                .frame(width: 370)
+                .frame(width: 360)
         }
         .background(Color(UIColor.secondarySystemBackground))
-        .sheet(item: $selectedItemForCustomization) { item in
-            ItemCustomizerView(item: item) { orderItem in
-                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                    cartItems.append(orderItem)
-                }
-            }
-        }
     }
 }
 
@@ -150,9 +144,9 @@ struct MenuItemCard: View {
                     .font(.system(size: 15, weight: .black))
                     .foregroundColor(.green)
 
-                Text("تخصيص وإضافة ⚙️")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(.orange)
+                Text("اضغط للإضافة")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
             }
             .padding(12)
             .background(Color(UIColor.systemBackground))

@@ -1,36 +1,5 @@
 import Foundation
 
-public struct CustomAddOn: Identifiable, Codable, Equatable, Hashable {
-    public var id: UUID
-    public var name: String
-    public var price: Int
-
-    public init(id: UUID = UUID(), name: String, price: Int) {
-        self.id = id
-        self.name = name
-        self.price = price
-    }
-
-    public static let defaultAddOns: [CustomAddOn] = [
-        CustomAddOn(name: "جبن شيدر إضافي", price: 500),
-        CustomAddOn(name: "قطعة لحم إضافية", price: 1500),
-        CustomAddOn(name: "قطعة دجاج إضافية", price: 1250),
-        CustomAddOn(name: "بطاطا مقلية صغيرة", price: 1000),
-        CustomAddOn(name: "صوص ادم الخاص", price: 250),
-        CustomAddOn(name: "بيكون مدخن", price: 1000)
-    ]
-
-    public static let defaultPreferences: [String] = [
-        "بدون بصل",
-        "بدون طماطة",
-        "بدون مخلل",
-        "صوص حار (سبايسي)",
-        "زيادة مايونيز",
-        "خبز محمص زيادة",
-        "بدون خضار"
-    ]
-}
-
 public struct MenuItem: Identifiable, Codable, Equatable, Hashable {
     public var id: UUID
     public var name: String

@@ -3,11 +3,13 @@ import SwiftUI
 public struct ReceiptView: View {
     public let order: Order
     @Environment(\.presentationMode) var presentationMode
+    @State private var showingShareSheet = false
 
     public var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 16) {
+                    // شارة المطعم
                     VStack(spacing: 6) {
                         Text("🍔")
                             .font(.system(size: 48))
@@ -22,6 +24,7 @@ public struct ReceiptView: View {
 
                     Divider()
 
+                    // تفاصيل الفاتورة
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Text("رقم الطلب:")
@@ -74,38 +77,42 @@ public struct ReceiptView: View {
 
                     Divider()
 
-                    // قائمة الأصناف مع الإضافات
-                    VStack(spacing: 12) {
+                    // جدول الأصناف
+                    VStack(spacing: 10) {
+                        HStack {
+                            Text("الصنف")
+                                .fontWeight(.bold)
+                            Spacer()
+                            Text("الكمية")
+                                .fontWeight(.bold)
+                            Spacer()
+                            Text("السعر")
+                                .fontWeight(.bold)
+                        }
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
+
                         ForEach(order.items) { item in
-                            VStack(alignment: .leading, spacing: 4) {
-                                HStack {
-                                    Text("\(item.name) × \(item.quantity)")
-                                        .fontWeight(.bold)
-                                    Spacer()
-                                    Text(DataManager.formatMoney(item.totalPrice))
-                                        .fontWeight(.black)
-                                }
-                                .font(.system(size: 14))
-
-                                if !item.selectedAddOns.isEmpty {
-                                    Text("+ " + item.selectedAddOns.map { "\($0.name) (+\($0.price))" }.joined(separator: " ، "))
-                                        .font(.system(size: 11))
-                                        .foregroundColor(.orange)
-                                }
-
-                                if !item.selectedPreferences.isEmpty {
-                                    Text("• " + item.selectedPreferences.joined(separator: " ، "))
-                                        .font(.system(size: 11))
-                                        .foregroundColor(.secondary)
-                                }
+                            HStack {
+                                Text(item.name)
+                                    .fontWeight(.semibold)
+                                Spacer()
+                                Text("× \(item.quantity)")
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Text(DataManager.formatMoney(item.totalPrice))
+                                    .fontWeight(.bold)
                             }
-                            Divider()
+                            .font(.system(size: 14))
                         }
                     }
                     .padding(.horizontal)
 
+                    Divider()
+
+                    // المجموع النهائي
                     HStack {
-                        Text("المجموع النهائي:")
+                        Text("المجموع الكلي:")
                             .font(.system(size: 18, weight: .bold))
                         Spacer()
                         Text(DataManager.formatMoney(order.total))
@@ -159,22 +166,11 @@ public struct ReceiptView: View {
     private func generateHTMLReceipt() -> String {
         var itemsHtml = ""
         for item in order.items {
-            var subdetails = ""
-            if !item.selectedAddOns.isEmpty {
-                subdetails += "<div style='font-size:10px; color:#d97706;'>+ " + item.selectedAddOns.map { "\($0.name) (+\($0.price))" }.joined(separator: " ، ") + "</div>"
-            }
-            if !item.selectedPreferences.isEmpty {
-                subdetails += "<div style='font-size:10px; color:#666;'>• " + item.selectedPreferences.joined(separator: " ، ") + "</div>"
-            }
-
             itemsHtml += """
             <tr>
-                <td style="padding:6px 0;border-bottom:1px solid #eee;">
-                    <div>\(item.name)</div>
-                    \(subdetails)
-                </td>
-                <td style="padding:6px 0;text-align:center;border-bottom:1px solid #eee;vertical-align:top;">\(item.quantity)</td>
-                <td style="padding:6px 0;text-align:left;border-bottom:1px solid #eee;vertical-align:top;">\(DataManager.formatMoney(item.totalPrice))</td>
+                <td style="padding:6px 0;border-bottom:1px solid #eee;">\(item.name)</td>
+                <td style="padding:6px 0;text-align:center;border-bottom:1px solid #eee;">\(item.quantity)</td>
+                <td style="padding:6px 0;text-align:left;border-bottom:1px solid #eee;">\(DataManager.formatMoney(item.totalPrice))</td>
             </tr>
             """
         }
