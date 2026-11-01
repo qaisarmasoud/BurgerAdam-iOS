@@ -6,7 +6,6 @@ public class DataManager: ObservableObject {
     @Published public var menuItems: [MenuItem] = []
     @Published public var orders: [Order] = []
     @Published public var expenses: [Expense] = []
-    @Published public var lastSavedText: String = "تم الحفظ"
     
     private let menuFileName = "adam_menu.json"
     private let ordersFileName = "adam_orders.json"
@@ -28,31 +27,51 @@ public class DataManager: ObservableObject {
         return "\(formatted) د.ع"
     }
 
+    // حساب يوم عمل المطعم (إذا كان الوقت بعد منتصف الليل وقبل 4:30 فجراً، يُعتبر تابعاً لشفت ليلة الأمس)
+    public static func restaurantBusinessDate(for date: Date = Date()) -> Date {
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: date)
+        if hour < 4 { // بين 12 ليلاً و 4 صباحاً
+            return calendar.date(byAdding: .day, value: -1, to: date) ?? date
+        }
+        return date
+    }
+
     public func loadAllData() {
-        // تحميل المنيو
+        let decoder = JSONDecoder()
+
+        // 1. تحميل المنيو
         let menuURL = documentsDirectory.appendingPathComponent(menuFileName)
         if let data = try? Data(contentsOf: menuURL),
-           let decoded = try? JSONDecoder().decode([MenuItem].self, from: data) {
+           let decoded = try? decoder.decode([MenuItem].self, from: data) {
             self.menuItems = decoded
         } else {
             self.menuItems = MenuItem.defaultMenu
             saveMenu()
         }
 
-        // تحميل الطلبات
+        // 2. تحميل الطلبات (مع حماية واسترجاع من الذاكرة الاحتياطية إن وُجدت)
         let ordersURL = documentsDirectory.appendingPathComponent(ordersFileName)
         if let data = try? Data(contentsOf: ordersURL),
-           let decoded = try? JSONDecoder().decode([Order].self, from: data) {
+           let decoded = try? decoder.decode([Order].self, from: data) {
             self.orders = decoded
+        } else if let savedData = UserDefaults.standard.data(forKey: "adam_orders_backup"),
+                  let decoded = try? decoder.decode([Order].self, from: savedData) {
+            self.orders = decoded
+            saveOrders()
         } else {
             self.orders = []
         }
 
-        // تحميل المصاريف
+        // 3. تحميل المصاريف
         let expensesURL = documentsDirectory.appendingPathComponent(expensesFileName)
         if let data = try? Data(contentsOf: expensesURL),
-           let decoded = try? JSONDecoder().decode([Expense].self, from: data) {
+           let decoded = try? decoder.decode([Expense].self, from: data) {
             self.expenses = decoded
+        } else if let savedData = UserDefaults.standard.data(forKey: "adam_expenses_backup"),
+                  let decoded = try? decoder.decode([Expense].self, from: savedData) {
+            self.expenses = decoded
+            saveExpenses()
         } else {
             self.expenses = []
         }
@@ -61,21 +80,26 @@ public class DataManager: ObservableObject {
     public func saveMenu() {
         let menuURL = documentsDirectory.appendingPathComponent(menuFileName)
         if let encoded = try? JSONEncoder().encode(menuItems) {
-            try? encoded.write(to: menuURL)
+            try? encoded.write(to: menuURL, options: .atomic)
         }
     }
 
     public func saveOrders() {
-        let ordersURL = documentsDirectory.appendingPathComponent(ordersFileName)
-        if let encoded = try? JSONEncoder().encode(orders) {
-            try? encoded.write(to: ordersURL)
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(orders) {
+            let ordersURL = documentsDirectory.appendingPathComponent(ordersFileName)
+            try? encoded.write(to: ordersURL, options: .atomic)
+            // حفظ نسخة احتياطية إضافية فورية في UserDefaults لضمان عدم الضياع نهائياً
+            UserDefaults.standard.set(encoded, forKey: "adam_orders_backup")
         }
     }
 
     public func saveExpenses() {
-        let expensesURL = documentsDirectory.appendingPathComponent(expensesFileName)
-        if let encoded = try? JSONEncoder().encode(expenses) {
-            try? encoded.write(to: expensesURL)
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(expenses) {
+            let expensesURL = documentsDirectory.appendingPathComponent(expensesFileName)
+            try? encoded.write(to: expensesURL, options: .atomic)
+            UserDefaults.standard.set(encoded, forKey: "adam_expenses_backup")
         }
     }
 
@@ -128,15 +152,23 @@ public class DataManager: ObservableObject {
         saveMenu()
     }
 
-    // إحصائيات اليوم المحدد
+    // فلترة الطلبات والمصاريف بحسب يوم عمل المطعم
     public func orders(for date: Date) -> [Order] {
         let calendar = Calendar.current
-        return orders.filter { calendar.isDate($0.date, inSameDayAs: date) }
+        return orders.filter { order in
+            let orderBizDate = DataManager.restaurantBusinessDate(for: order.date)
+            let targetBizDate = DataManager.restaurantBusinessDate(for: date)
+            return calendar.isDate(orderBizDate, inSameDayAs: targetBizDate)
+        }
     }
 
     public func expenses(for date: Date) -> [Expense] {
         let calendar = Calendar.current
-        return expenses.filter { calendar.isDate($0.date, inSameDayAs: date) }
+        return expenses.filter { exp in
+            let expBizDate = DataManager.restaurantBusinessDate(for: exp.date)
+            let targetBizDate = DataManager.restaurantBusinessDate(for: date)
+            return calendar.isDate(expBizDate, inSameDayAs: targetBizDate)
+        }
     }
 
     public func totalSales(for date: Date) -> Int {
@@ -149,6 +181,19 @@ public class DataManager: ObservableObject {
 
     public func netProfit(for date: Date) -> Int {
         totalSales(for: date) - totalExpenses(for: date)
+    }
+
+    // الإجماليات الشاملة لكل الأوقات (All-Time)
+    public var allTimeSalesTotal: Int {
+        orders.reduce(0) { $0 + $1.total }
+    }
+
+    public var allTimeExpensesTotal: Int {
+        expenses.reduce(0) { $0 + $1.amount }
+    }
+
+    public var allTimeNetProfit: Int {
+        allTimeSalesTotal - allTimeExpensesTotal
     }
 
     // تصدير واستيراد النسخة الاحتياطية
@@ -164,7 +209,7 @@ public class DataManager: ObservableObject {
     public func exportBackupURL() -> URL? {
         let backup = BackupData(
             app: "بركر ادم",
-            version: 2,
+            version: 3,
             exportedAt: Date(),
             menu: menuItems,
             orders: orders,
@@ -177,7 +222,7 @@ public class DataManager: ObservableObject {
         
         let dateString = ISO8601DateFormatter().string(from: Date()).prefix(10)
         let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("BurgerAdam-Backup-\(dateString).json")
-        try? data.write(to: tempURL)
+        try? data.write(to: tempURL, options: .atomic)
         return tempURL
     }
 

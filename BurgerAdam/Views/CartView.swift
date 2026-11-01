@@ -44,6 +44,20 @@ public struct CartView: View {
             .padding(14)
             .background(AdamTheme.card)
 
+            // شريط إحصائي سريع للكاشير
+            HStack {
+                Text("شفت اليوم: \(DataManager.formatMoney(dataManager.totalSales(for: Date()))) (\(dataManager.orders(for: Date()).count) طلب)")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(AdamTheme.green)
+                Spacer()
+                Text("العدد الكلي: #\(dataManager.orders.count)")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(AdamTheme.amber)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 6)
+            .background(AdamTheme.bg)
+
             Divider().background(AdamTheme.border)
 
             if itemsList.isEmpty {
