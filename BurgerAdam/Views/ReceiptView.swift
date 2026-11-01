@@ -3,32 +3,30 @@ import SwiftUI
 public struct ReceiptView: View {
     public let order: Order
     @Environment(\.presentationMode) var presentationMode
-    @State private var showingShareSheet = false
 
     public var body: some View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 16) {
-                    // شارة المطعم
                     VStack(spacing: 6) {
                         Text("🍔")
-                            .font(.system(size: 48))
+                            .font(.system(size: 46))
                         Text("بركر ادم")
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundColor(.primary)
+                            .font(.system(size: 22, weight: .bold))
+                            .foregroundColor(AdamTheme.textPrimary)
                         Text("نظام الكاشير والمبيعات")
                             .font(.system(size: 13))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AdamTheme.textSecondary)
                     }
                     .padding(.top, 10)
 
-                    Divider()
+                    Divider().background(AdamTheme.border)
 
-                    // تفاصيل الفاتورة
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Text("رقم الطلب:")
                                 .fontWeight(.bold)
+                                .foregroundColor(AdamTheme.textPrimary)
                             Spacer()
                             Text("#\(order.orderNumber)")
                                 .fontWeight(.black)
@@ -37,48 +35,53 @@ public struct ReceiptView: View {
 
                         HStack {
                             Text("التاريخ والوقت:")
+                                .foregroundColor(AdamTheme.textSecondary)
                             Spacer()
                             Text(order.date.formatted(date: .abbreviated, time: .shortened))
+                                .foregroundColor(AdamTheme.textPrimary)
                         }
 
                         HStack {
                             Text("نوع الطلب:")
+                                .foregroundColor(AdamTheme.textSecondary)
                             Spacer()
                             Text(order.orderType.rawValue)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 3)
-                                .background(Color.orange.opacity(0.15))
-                                .foregroundColor(.orange)
+                                .background(AdamTheme.amber.opacity(0.18))
+                                .foregroundColor(AdamTheme.amber)
                                 .cornerRadius(6)
                         }
 
                         HStack {
                             Text("طريقة الدفع:")
+                                .foregroundColor(AdamTheme.textSecondary)
                             Spacer()
                             Text(order.paymentMethod.rawValue)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 3)
-                                .background(Color.green.opacity(0.15))
-                                .foregroundColor(.green)
+                                .background(AdamTheme.green.opacity(0.18))
+                                .foregroundColor(AdamTheme.green)
                                 .cornerRadius(6)
                         }
 
                         if !order.note.isEmpty {
                             HStack(alignment: .top) {
                                 Text("ملاحظة:")
+                                    .foregroundColor(AdamTheme.textSecondary)
                                 Spacer()
                                 Text(order.note)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(AdamTheme.textPrimary)
                             }
                         }
                     }
                     .font(.system(size: 14))
                     .padding(.horizontal)
 
-                    Divider()
+                    Divider().background(AdamTheme.border)
 
                     // جدول الأصناف
-                    VStack(spacing: 10) {
+                    VStack(spacing: 8) {
                         HStack {
                             Text("الصنف")
                                 .fontWeight(.bold)
@@ -90,47 +93,51 @@ public struct ReceiptView: View {
                                 .fontWeight(.bold)
                         }
                         .font(.system(size: 13))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AdamTheme.textSecondary)
 
                         ForEach(order.items) { item in
                             HStack {
                                 Text(item.name)
                                     .fontWeight(.semibold)
+                                    .foregroundColor(AdamTheme.textPrimary)
                                 Spacer()
                                 Text("× \(item.quantity)")
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(AdamTheme.textSecondary)
                                 Spacer()
                                 Text(DataManager.formatMoney(item.totalPrice))
                                     .fontWeight(.bold)
+                                    .foregroundColor(AdamTheme.green)
                             }
                             .font(.system(size: 14))
                         }
                     }
                     .padding(.horizontal)
 
-                    Divider()
+                    Divider().background(AdamTheme.border)
 
-                    // المجموع النهائي
                     HStack {
-                        Text("المجموع الكلي:")
-                            .font(.system(size: 18, weight: .bold))
+                        Text("المجموع النهائي:")
+                            .font(.system(size: 17, weight: .bold))
+                            .foregroundColor(AdamTheme.textPrimary)
                         Spacer()
                         Text(DataManager.formatMoney(order.total))
-                            .font(.system(size: 22, weight: .black))
-                            .foregroundColor(.green)
+                            .font(.system(size: 21, weight: .black))
+                            .foregroundColor(AdamTheme.green)
                     }
                     .padding(.horizontal)
 
                     Text("شكراً لزيارتكم! نتشرف بخدمتكم دائماً")
                         .font(.system(size: 12))
-                        .foregroundColor(.secondary)
-                        .padding(.top, 10)
+                        .foregroundColor(AdamTheme.textSecondary)
+                        .padding(.top, 8)
                 }
                 .padding()
-                .background(Color(UIColor.secondarySystemBackground))
+                .background(AdamTheme.card)
                 .cornerRadius(16)
+                .overlay(RoundedRectangle(cornerRadius: 16).stroke(AdamTheme.border, lineWidth: 1))
                 .padding()
             }
+            .background(AdamTheme.bg)
             .navigationTitle("فاتورة الطلب")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -7,40 +7,42 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		737DCC9577664700BA1AC2F0 /* BurgerAdamApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D29AFC34C99F46E1A9F7F351 /* BurgerAdamApp.swift */; };
-		493F7D0FC5B449F6B0D91D4D /* MenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32A7F8103B940F2BFC3E67B /* MenuItem.swift */; };
-		373B0F2AD53241148435D9FB /* Order.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEE42B42D9D24C00AD52AD69 /* Order.swift */; };
-		BF2D1452FAEB49A6B1FF28DA /* Expense.swift in Sources */ = {isa = PBXBuildFile; fileRef = D619F268A6C8462C86FE9C4F /* Expense.swift */; };
-		69D4CE45818F436988EF1A3F /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7524F0A41E524B18A992CD21 /* DataManager.swift */; };
-		58C5BEAA8D584926A6E17510 /* ReceiptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93832F54E16D44368498A4B8 /* ReceiptView.swift */; };
-		BE1E827F048B4A7EB7DC8F04 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DB698B61C724E658206BDCE /* CartView.swift */; };
-		3DB46714B97247DE800315BA /* CashierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09B9C47397874CBFB2A5A859 /* CashierView.swift */; };
-		DD6387A24EB5486988ED5E88 /* ExpensesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A9A1157024C41FB88EF0A31 /* ExpensesView.swift */; };
-		E85AA251A5FD45DCBC897B2E /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09B59A65CC7C4BE7A0D7F220 /* ReportsView.swift */; };
-		B5D85A89C55D4253AE07DE04 /* SettingsAndBackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5855B5E14214A2DB413D461 /* SettingsAndBackupView.swift */; };
-		0A72CCD2CE5E4B65811887A9 /* MainiPadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D449DFBD7D495F91E4A3C9 /* MainiPadView.swift */; };
-		2C837FDA088D4460BBC9B41D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1547F9B806EC4BE096F7F4C3 /* Assets.xcassets */; };
+		1D9ECE88D1A1455D8D296018 /* BurgerAdamApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA572110BB504639B8CD3C99 /* BurgerAdamApp.swift */; };
+		A836E1664B8346649DE9D0A9 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E53BECD1D3F4F22890FF754 /* Theme.swift */; };
+		E476004F70F5455F91F8905F /* MenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4D9FBB41B5F431D9DF91056 /* MenuItem.swift */; };
+		8D90AD839632490782C5AC59 /* Order.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4F78615CD9814D90A576222E /* Order.swift */; };
+		A0D73108E38F441D8834AA87 /* Expense.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEEF7EA94BE74EA2BBFED9EC /* Expense.swift */; };
+		9B780B6E9B0344968B4A6B48 /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF059A69033F4A42846558DC /* DataManager.swift */; };
+		0A6DE3066DE94B669FD21CC2 /* ReceiptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A15A3F487E1C4FFC965EC8AD /* ReceiptView.swift */; };
+		41799CBB9ADA412FBF8A4AAD /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 594B35C9C8984ECEA7CA52D7 /* CartView.swift */; };
+		4B448E607116432E8A9E1332 /* CashierView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 781E5D9FF0CF48E69CB05B6A /* CashierView.swift */; };
+		EF046C6729E74ADFA5EA121E /* ExpensesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B7AC62EF15741EFB9A3FB76 /* ExpensesView.swift */; };
+		95F56CD552D04EAA99B2843A /* ReportsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81467490848D4009A6564083 /* ReportsView.swift */; };
+		CD83B0AB43A74E649533436A /* SettingsAndBackupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D47CB0E5754C1B8F500294 /* SettingsAndBackupView.swift */; };
+		5CE6D022DED04AB39549E709 /* MainiPadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A435B7A8918A47B3B1F94E27 /* MainiPadView.swift */; };
+		A892B0B3C4974C78BCC87CEA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A60B248A791545D99EB4251F /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		592122C40F7541C688349DC8 /* BurgerAdam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BurgerAdam.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D29AFC34C99F46E1A9F7F351 /* BurgerAdamApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/BurgerAdamApp.swift"; sourceTree = "<group>"; };
-		D32A7F8103B940F2BFC3E67B /* MenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Models/MenuItem.swift"; sourceTree = "<group>"; };
-		FEE42B42D9D24C00AD52AD69 /* Order.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Models/Order.swift"; sourceTree = "<group>"; };
-		D619F268A6C8462C86FE9C4F /* Expense.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Models/Expense.swift"; sourceTree = "<group>"; };
-		7524F0A41E524B18A992CD21 /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Models/DataManager.swift"; sourceTree = "<group>"; };
-		93832F54E16D44368498A4B8 /* ReceiptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/ReceiptView.swift"; sourceTree = "<group>"; };
-		0DB698B61C724E658206BDCE /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/CartView.swift"; sourceTree = "<group>"; };
-		09B9C47397874CBFB2A5A859 /* CashierView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/CashierView.swift"; sourceTree = "<group>"; };
-		8A9A1157024C41FB88EF0A31 /* ExpensesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/ExpensesView.swift"; sourceTree = "<group>"; };
-		09B59A65CC7C4BE7A0D7F220 /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/ReportsView.swift"; sourceTree = "<group>"; };
-		D5855B5E14214A2DB413D461 /* SettingsAndBackupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/SettingsAndBackupView.swift"; sourceTree = "<group>"; };
-		E8D449DFBD7D495F91E4A3C9 /* MainiPadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/MainiPadView.swift"; sourceTree = "<group>"; };
-		1547F9B806EC4BE096F7F4C3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = BurgerAdam/Assets.xcassets; sourceTree = "<group>"; };
+		1D465BDF7B4645ED81B18153 /* BurgerAdam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BurgerAdam.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FA572110BB504639B8CD3C99 /* BurgerAdamApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/BurgerAdamApp.swift"; sourceTree = "<group>"; };
+		4E53BECD1D3F4F22890FF754 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Theme.swift"; sourceTree = "<group>"; };
+		A4D9FBB41B5F431D9DF91056 /* MenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Models/MenuItem.swift"; sourceTree = "<group>"; };
+		4F78615CD9814D90A576222E /* Order.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Models/Order.swift"; sourceTree = "<group>"; };
+		BEEF7EA94BE74EA2BBFED9EC /* Expense.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Models/Expense.swift"; sourceTree = "<group>"; };
+		FF059A69033F4A42846558DC /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Models/DataManager.swift"; sourceTree = "<group>"; };
+		A15A3F487E1C4FFC965EC8AD /* ReceiptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/ReceiptView.swift"; sourceTree = "<group>"; };
+		594B35C9C8984ECEA7CA52D7 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/CartView.swift"; sourceTree = "<group>"; };
+		781E5D9FF0CF48E69CB05B6A /* CashierView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/CashierView.swift"; sourceTree = "<group>"; };
+		0B7AC62EF15741EFB9A3FB76 /* ExpensesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/ExpensesView.swift"; sourceTree = "<group>"; };
+		81467490848D4009A6564083 /* ReportsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/ReportsView.swift"; sourceTree = "<group>"; };
+		E6D47CB0E5754C1B8F500294 /* SettingsAndBackupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/SettingsAndBackupView.swift"; sourceTree = "<group>"; };
+		A435B7A8918A47B3B1F94E27 /* MainiPadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BurgerAdam/Views/MainiPadView.swift"; sourceTree = "<group>"; };
+		A60B248A791545D99EB4251F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = BurgerAdam/Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		6AFD75E9FE0D4B4EBA9F9688 /* Frameworks */ = {
+		FE3BE95220E9408F93844266 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -50,36 +52,37 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4E4A7EBDF1E94488BAAD81A0 = {
+		43C5F8F1424E41C3B3566763 = {
 			isa = PBXGroup;
 			children = (
-				D29AFC34C99F46E1A9F7F351 /* BurgerAdamApp.swift */,
-				D32A7F8103B940F2BFC3E67B /* MenuItem.swift */,
-				FEE42B42D9D24C00AD52AD69 /* Order.swift */,
-				D619F268A6C8462C86FE9C4F /* Expense.swift */,
-				7524F0A41E524B18A992CD21 /* DataManager.swift */,
-				93832F54E16D44368498A4B8 /* ReceiptView.swift */,
-				0DB698B61C724E658206BDCE /* CartView.swift */,
-				09B9C47397874CBFB2A5A859 /* CashierView.swift */,
-				8A9A1157024C41FB88EF0A31 /* ExpensesView.swift */,
-				09B59A65CC7C4BE7A0D7F220 /* ReportsView.swift */,
-				D5855B5E14214A2DB413D461 /* SettingsAndBackupView.swift */,
-				E8D449DFBD7D495F91E4A3C9 /* MainiPadView.swift */,
-				1547F9B806EC4BE096F7F4C3 /* Assets.xcassets */,
-				592122C40F7541C688349DC8 /* BurgerAdam.app */,
+				FA572110BB504639B8CD3C99 /* BurgerAdamApp.swift */,
+				4E53BECD1D3F4F22890FF754 /* Theme.swift */,
+				A4D9FBB41B5F431D9DF91056 /* MenuItem.swift */,
+				4F78615CD9814D90A576222E /* Order.swift */,
+				BEEF7EA94BE74EA2BBFED9EC /* Expense.swift */,
+				FF059A69033F4A42846558DC /* DataManager.swift */,
+				A15A3F487E1C4FFC965EC8AD /* ReceiptView.swift */,
+				594B35C9C8984ECEA7CA52D7 /* CartView.swift */,
+				781E5D9FF0CF48E69CB05B6A /* CashierView.swift */,
+				0B7AC62EF15741EFB9A3FB76 /* ExpensesView.swift */,
+				81467490848D4009A6564083 /* ReportsView.swift */,
+				E6D47CB0E5754C1B8F500294 /* SettingsAndBackupView.swift */,
+				A435B7A8918A47B3B1F94E27 /* MainiPadView.swift */,
+				A60B248A791545D99EB4251F /* Assets.xcassets */,
+				1D465BDF7B4645ED81B18153 /* BurgerAdam.app */,
 			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		2F703390ED5A4955B297850A /* BurgerAdam */ = {
+		CEE8C82E9E534AF7B2298284 /* BurgerAdam */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F80CA3A6FEF849C7853FB522 /* Build configuration list for PBXNativeTarget "BurgerAdam" */;
+			buildConfigurationList = 726B12DBC1784E32A163C4DE /* Build configuration list for PBXNativeTarget "BurgerAdam" */;
 			buildPhases = (
-				A50EC9674B57450FA58FD5A7 /* Sources */,
-				6AFD75E9FE0D4B4EBA9F9688 /* Frameworks */,
-				D1B5F74ABEAF4290A5309FC1 /* Resources */,
+				2A347405AA2549F2859DA4A2 /* Sources */,
+				FE3BE95220E9408F93844266 /* Frameworks */,
+				C7C4264C830848D2BD365E06 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -87,25 +90,25 @@
 			);
 			name = BurgerAdam;
 			productName = BurgerAdam;
-			productReference = 592122C40F7541C688349DC8 /* BurgerAdam.app */;
+			productReference = 1D465BDF7B4645ED81B18153 /* BurgerAdam.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		3E826C73296545F9826BE7D3 /* Project object */ = {
+		1E610A79E9154FFF91BD2E27 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1400;
 				LastUpgradeCheck = 1400;
 				TargetAttributes = {
-					2F703390ED5A4955B297850A = {
+					CEE8C82E9E534AF7B2298284 = {
 						CreatedOnToolsVersion = 14.0;
 					};
 				};
 			};
-			buildConfigurationList = EE6C2F8B2EED489BA4FA062A /* Build configuration list for PBXProject "BurgerAdam" */;
+			buildConfigurationList = A976ECE43F974CB0ABE84D95 /* Build configuration list for PBXProject "BurgerAdam" */;
 			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = ar;
 			hasScannedForEncodings = 0;
@@ -114,51 +117,52 @@
 				en,
 				Base,
 			);
-			mainGroup = 4E4A7EBDF1E94488BAAD81A0;
-			productRefGroup = 4E4A7EBDF1E94488BAAD81A0;
+			mainGroup = 43C5F8F1424E41C3B3566763;
+			productRefGroup = 43C5F8F1424E41C3B3566763;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2F703390ED5A4955B297850A /* BurgerAdam */,
+				CEE8C82E9E534AF7B2298284 /* BurgerAdam */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		D1B5F74ABEAF4290A5309FC1 /* Resources */ = {
+		C7C4264C830848D2BD365E06 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2C837FDA088D4460BBC9B41D /* Assets.xcassets in Resources */,
+				A892B0B3C4974C78BCC87CEA /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		A50EC9674B57450FA58FD5A7 /* Sources */ = {
+		2A347405AA2549F2859DA4A2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				737DCC9577664700BA1AC2F0 /* BurgerAdamApp.swift in Sources */,
-				493F7D0FC5B449F6B0D91D4D /* MenuItem.swift in Sources */,
-				373B0F2AD53241148435D9FB /* Order.swift in Sources */,
-				BF2D1452FAEB49A6B1FF28DA /* Expense.swift in Sources */,
-				69D4CE45818F436988EF1A3F /* DataManager.swift in Sources */,
-				58C5BEAA8D584926A6E17510 /* ReceiptView.swift in Sources */,
-				BE1E827F048B4A7EB7DC8F04 /* CartView.swift in Sources */,
-				3DB46714B97247DE800315BA /* CashierView.swift in Sources */,
-				DD6387A24EB5486988ED5E88 /* ExpensesView.swift in Sources */,
-				E85AA251A5FD45DCBC897B2E /* ReportsView.swift in Sources */,
-				B5D85A89C55D4253AE07DE04 /* SettingsAndBackupView.swift in Sources */,
-				0A72CCD2CE5E4B65811887A9 /* MainiPadView.swift in Sources */,
+				1D9ECE88D1A1455D8D296018 /* BurgerAdamApp.swift in Sources */,
+				A836E1664B8346649DE9D0A9 /* Theme.swift in Sources */,
+				E476004F70F5455F91F8905F /* MenuItem.swift in Sources */,
+				8D90AD839632490782C5AC59 /* Order.swift in Sources */,
+				A0D73108E38F441D8834AA87 /* Expense.swift in Sources */,
+				9B780B6E9B0344968B4A6B48 /* DataManager.swift in Sources */,
+				0A6DE3066DE94B669FD21CC2 /* ReceiptView.swift in Sources */,
+				41799CBB9ADA412FBF8A4AAD /* CartView.swift in Sources */,
+				4B448E607116432E8A9E1332 /* CashierView.swift in Sources */,
+				EF046C6729E74ADFA5EA121E /* ExpensesView.swift in Sources */,
+				95F56CD552D04EAA99B2843A /* ReportsView.swift in Sources */,
+				CD83B0AB43A74E649533436A /* SettingsAndBackupView.swift in Sources */,
+				5CE6D022DED04AB39549E709 /* MainiPadView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
-		1D5C22481B4A4899AB0E423B /* Debug */ = {
+		E526966A47674744A38F41E3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -174,7 +178,7 @@
 			};
 			name = Debug;
 		};
-		AD61354A9DF8416FB91E9125 /* Release */ = {
+		C8021F5D49E34374B40058E9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -191,7 +195,7 @@
 			};
 			name = Release;
 		};
-		FD458EA828FA4FF39F0CAED3 /* Debug */ = {
+		553DDA2C1020465DA60EACE0 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -210,7 +214,7 @@
 			};
 			name = Debug;
 		};
-		4D77BB8B75934FF3ABDF6C57 /* Release */ = {
+		F796D9945F8D45F093464082 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -232,20 +236,20 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		EE6C2F8B2EED489BA4FA062A /* Build configuration list for PBXProject "BurgerAdam" */ = {
+		A976ECE43F974CB0ABE84D95 /* Build configuration list for PBXProject "BurgerAdam" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				1D5C22481B4A4899AB0E423B /* Debug */,
-				AD61354A9DF8416FB91E9125 /* Release */,
+				E526966A47674744A38F41E3 /* Debug */,
+				C8021F5D49E34374B40058E9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F80CA3A6FEF849C7853FB522 /* Build configuration list for PBXNativeTarget "BurgerAdam" */ = {
+		726B12DBC1784E32A163C4DE /* Build configuration list for PBXNativeTarget "BurgerAdam" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FD458EA828FA4FF39F0CAED3 /* Debug */,
-				4D77BB8B75934FF3ABDF6C57 /* Release */,
+				553DDA2C1020465DA60EACE0 /* Debug */,
+				F796D9945F8D45F093464082 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -253,5 +257,5 @@
 /* End XCConfigurationList section */
 
 	};
-	rootObject = 3E826C73296545F9826BE7D3 /* Project object */;
+	rootObject = 1E610A79E9154FFF91BD2E27 /* Project object */;
 }

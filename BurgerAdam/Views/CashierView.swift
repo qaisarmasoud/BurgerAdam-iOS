@@ -21,9 +21,8 @@ public struct CashierView: View {
         }
     }
 
-    // شبكة أعمدة مخصصة للآيباد (LazyVGrid)
     private let columns = [
-        GridItem(.adaptive(minimum: 150, maximum: 200), spacing: 14)
+        GridItem(.adaptive(minimum: 150, maximum: 190), spacing: 12)
     ]
 
     public var body: some View {
@@ -34,19 +33,21 @@ public struct CashierView: View {
                 VStack(spacing: 10) {
                     HStack {
                         Image(systemName: "magnifyingglass")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(AdamTheme.textSecondary)
                         TextField("بحث عن وجبة أو مشروب...", text: $searchText)
                             .font(.system(size: 15))
+                            .foregroundColor(AdamTheme.textPrimary)
                         if !searchText.isEmpty {
                             Button(action: { searchText = "" }) {
                                 Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(AdamTheme.textSecondary)
                             }
                         }
                     }
                     .padding(10)
-                    .background(Color(UIColor.secondarySystemBackground))
+                    .background(AdamTheme.card)
                     .cornerRadius(12)
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(AdamTheme.border, lineWidth: 1))
                     .padding(.horizontal)
                     .padding(.top, 10)
 
@@ -55,15 +56,19 @@ public struct CashierView: View {
                         HStack(spacing: 8) {
                             ForEach(categories, id: \.self) { cat in
                                 Button(action: {
-                                    withAnimation { selectedCategory = cat }
+                                    selectedCategory = cat
                                 }) {
                                     Text(cat)
-                                        .font(.system(size: 14, weight: .bold))
+                                        .font(.system(size: 13, weight: .bold))
                                         .padding(.horizontal, 14)
                                         .padding(.vertical, 8)
-                                        .background(selectedCategory == cat ? Color.orange : Color(UIColor.secondarySystemBackground))
-                                        .foregroundColor(selectedCategory == cat ? .white : .primary)
+                                        .background(selectedCategory == cat ? AdamTheme.amber : AdamTheme.card)
+                                        .foregroundColor(selectedCategory == cat ? .black : AdamTheme.textPrimary)
                                         .cornerRadius(20)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .stroke(selectedCategory == cat ? AdamTheme.amber : AdamTheme.border, lineWidth: 1)
+                                        )
                                 }
                             }
                         }
@@ -71,40 +76,37 @@ public struct CashierView: View {
                     }
                     .padding(.bottom, 6)
                 }
-                .background(Color(UIColor.systemBackground))
+                .background(AdamTheme.bg)
 
-                Divider()
+                Divider().background(AdamTheme.border)
 
-                // شبكة الأصناف
+                // شبكة الأصناف (بدون ظلال لمنع استهلاك البطارية والحرارة)
                 ScrollView {
-                    LazyVGrid(columns: columns, spacing: 14) {
+                    LazyVGrid(columns: columns, spacing: 12) {
                         ForEach(filteredItems) { item in
                             MenuItemCard(item: item, cartQty: cartItems[item.id] ?? 0) {
-                                // إضافة للسلة مع اهتزاز لمسي
-                                withAnimation(.spring(response: 0.25, dampingFraction: 0.6)) {
-                                    cartItems[item.id] = (cartItems[item.id] ?? 0) + 1
-                                }
+                                cartItems[item.id] = (cartItems[item.id] ?? 0) + 1
                                 let generator = UIImpactFeedbackGenerator(style: .light)
                                 generator.impactOccurred()
                             }
                         }
                     }
-                    .padding(16)
+                    .padding(14)
                 }
             }
             .frame(maxWidth: .infinity)
 
-            Divider()
+            Divider().background(AdamTheme.border)
 
-            // القسم الجانبي: السلة والدفع (شاشة مقسومة للآيباد)
+            // القسم الجانبي: السلة والدفع السريع
             CartView(dataManager: dataManager, cartItems: $cartItems)
                 .frame(width: 360)
         }
-        .background(Color(UIColor.secondarySystemBackground))
+        .background(AdamTheme.bg)
     }
 }
 
-// كرت الصنف
+// كرت الصنف فائق الكفاءة والسرعة
 struct MenuItemCard: View {
     let item: MenuItem
     let cartQty: Int
@@ -115,46 +117,44 @@ struct MenuItemCard: View {
             VStack(spacing: 8) {
                 ZStack(alignment: .topTrailing) {
                     Text(item.emoji)
-                        .font(.system(size: 44))
+                        .font(.system(size: 42))
                         .frame(maxWidth: .infinity)
-                        .frame(height: 70)
-                        .background(Color(UIColor.systemBackground))
-                        .cornerRadius(12)
+                        .frame(height: 64)
+                        .background(AdamTheme.bg)
+                        .cornerRadius(10)
 
                     if cartQty > 0 {
                         Text("\(cartQty)")
-                            .font(.system(size: 13, weight: .black))
-                            .foregroundColor(.white)
-                            .frame(width: 24, height: 24)
-                            .background(Color.green)
+                            .font(.system(size: 12, weight: .black))
+                            .foregroundColor(.black)
+                            .frame(width: 22, height: 22)
+                            .background(AdamTheme.amber)
                             .clipShape(Circle())
                             .offset(x: 4, y: -4)
-                            .shadow(radius: 2)
                     }
                 }
 
                 Text(item.name)
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(.primary)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(AdamTheme.textPrimary)
                     .multilineTextAlignment(.center)
                     .lineLimit(2)
-                    .frame(height: 38)
+                    .frame(height: 36)
 
                 Text(DataManager.formatMoney(item.price))
                     .font(.system(size: 15, weight: .black))
-                    .foregroundColor(.green)
+                    .foregroundColor(AdamTheme.green)
 
                 Text("اضغط للإضافة")
                     .font(.system(size: 11))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(AdamTheme.textSecondary)
             }
-            .padding(12)
-            .background(Color(UIColor.systemBackground))
-            .cornerRadius(16)
-            .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 3)
+            .padding(10)
+            .background(AdamTheme.card)
+            .cornerRadius(14)
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(cartQty > 0 ? Color.green.opacity(0.5) : Color.clear, lineWidth: 2)
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(cartQty > 0 ? AdamTheme.green : AdamTheme.border, lineWidth: cartQty > 0 ? 2 : 1)
             )
         }
         .buttonStyle(PlainButtonStyle())

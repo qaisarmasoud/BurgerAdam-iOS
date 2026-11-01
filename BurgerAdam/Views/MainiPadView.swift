@@ -19,7 +19,6 @@ public struct MainiPadView: View {
                                 endPoint: .bottomTrailing
                             ))
                             .frame(width: 44, height: 44)
-                            .shadow(color: Color.orange.opacity(0.35), radius: 6, x: 0, y: 3)
                         Text("🍔")
                             .font(.system(size: 24))
                     }
@@ -30,54 +29,55 @@ public struct MainiPadView: View {
                             .foregroundColor(.white)
                         Text("نظام الكاشير والمصاريف والأرباح")
                             .font(.system(size: 11, weight: .bold))
-                            .foregroundColor(Color.white.opacity(0.75))
+                            .foregroundColor(AdamTheme.textSecondary)
                     }
                 }
 
                 Spacer()
 
-                // مؤشر الحفظ التلقائي المحلي
+                // مؤشر العمل بدون إنترنت
                 HStack(spacing: 6) {
                     Circle()
-                        .fill(Color.green)
+                        .fill(AdamTheme.green)
                         .frame(width: 8, height: 8)
                     Text("محلي • يعمل بدون إنترنت")
                         .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(Color.green.opacity(0.9))
+                        .foregroundColor(AdamTheme.green)
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(Color.green.opacity(0.12))
+                .background(AdamTheme.green.opacity(0.12))
                 .cornerRadius(20)
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
-                        .stroke(Color.green.opacity(0.3), lineWidth: 1)
+                        .stroke(AdamTheme.green.opacity(0.3), lineWidth: 1)
                 )
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 14)
-            .background(Color(red: 15/255, green: 23/255, blue: 42/255)) // slate-900
+            .background(AdamTheme.bg)
 
-            // شريط التبويبات العلوي للآيباد (Tabs)
+            // شريط التبويبات العلوي للآيباد
             HStack(spacing: 8) {
                 TabButton(title: "الكاشير والطلبات", icon: "cart.fill", isSelected: selectedTab == 0) {
-                    withAnimation { selectedTab = 0 }
+                    selectedTab = 0
                 }
                 TabButton(title: "المصاريف والنفقات", icon: "banknote.fill", isSelected: selectedTab == 1) {
-                    withAnimation { selectedTab = 1 }
+                    selectedTab = 1
                 }
                 TabButton(title: "الأرباح والتقارير", icon: "chart.pie.fill", isSelected: selectedTab == 2) {
-                    withAnimation { selectedTab = 2 }
+                    selectedTab = 2
                 }
                 TabButton(title: "المنيو والنسخ الاحتياطي", icon: "gearshape.fill", isSelected: selectedTab == 3) {
-                    withAnimation { selectedTab = 3 }
+                    selectedTab = 3
                 }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
-            .background(Color(UIColor.secondarySystemBackground))
+            .background(AdamTheme.card)
+            .overlay(Rectangle().frame(height: 1).foregroundColor(AdamTheme.border), alignment: .bottom)
 
-            // الصفحات
+            // محتوى الصفحات
             ZStack {
                 switch selectedTab {
                 case 0:
@@ -96,10 +96,11 @@ public struct MainiPadView: View {
         }
         .environment(\.layoutDirection, .rightToLeft)
         .ignoresSafeArea(.keyboard, edges: .bottom)
+        .background(AdamTheme.bg)
     }
 }
 
-// زر التبويب المخصص للآيباد
+// زر التبويب المخصص للآيباد (خفيف وبدون ظلال لمنع استهلاك البطارية والحرارة)
 struct TabButton: View {
     let title: String
     let icon: String
@@ -116,10 +117,13 @@ struct TabButton: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 10)
-            .background(isSelected ? Color(red: 15/255, green: 23/255, blue: 42/255) : Color(UIColor.systemBackground))
-            .foregroundColor(isSelected ? .white : .primary)
+            .background(isSelected ? AdamTheme.amber : AdamTheme.bg)
+            .foregroundColor(isSelected ? .black : AdamTheme.textPrimary)
             .cornerRadius(12)
-            .shadow(color: Color.black.opacity(isSelected ? 0.12 : 0.03), radius: 4, x: 0, y: 2)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isSelected ? AdamTheme.amber : AdamTheme.border, lineWidth: 1)
+            )
         }
         .buttonStyle(PlainButtonStyle())
     }

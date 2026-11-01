@@ -5,7 +5,7 @@ struct BurgerAdamApp: App {
     var body: some Scene {
         WindowGroup {
             MainiPadView()
-                .preferredColorScheme(.light)
+                .preferredColorScheme(.dark)
         }
     }
 }

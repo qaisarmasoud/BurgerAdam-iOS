@@ -4,14 +4,11 @@ import UniformTypeIdentifiers
 public struct SettingsAndBackupView: View {
     @ObservedObject var dataManager: DataManager
     
-    // لإضافة صنف جديد
     @State private var newItemName = ""
     @State private var newItemPrice = ""
     @State private var newItemCategory = "بركر لحم"
     @State private var newItemEmoji = "🍔"
     @State private var showingAddAlert = false
-    @State private var showingShareSheet = false
-    @State private var backupFileURL: URL?
     @State private var showingFilePicker = false
     @State private var importStatusMessage = ""
 
@@ -19,15 +16,16 @@ public struct SettingsAndBackupView: View {
 
     public var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 16) {
                 // قسم إدارة المنيو والأصناف
                 VStack(alignment: .leading, spacing: 14) {
                     HStack {
                         Text("إدارة قائمة الطعام (المنيو)")
                             .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(AdamTheme.textPrimary)
                         Spacer()
                         Button(action: { showingAddAlert = true }) {
-                            HStack {
+                            HStack(spacing: 6) {
                                 Image(systemName: "plus.circle.fill")
                                 Text("إضافة صنف جديد")
                             }
@@ -35,7 +33,7 @@ public struct SettingsAndBackupView: View {
                             .foregroundColor(.white)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 8)
-                            .background(Color.green)
+                            .background(AdamTheme.green)
                             .cornerRadius(10)
                         }
                     }
@@ -47,36 +45,36 @@ public struct SettingsAndBackupView: View {
                                 Text(item.emoji)
                                     .font(.system(size: 24))
                                     .frame(width: 36, height: 36)
-                                    .background(Color(UIColor.secondarySystemBackground))
+                                    .background(AdamTheme.bg)
                                     .cornerRadius(8)
 
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(item.name)
                                         .font(.system(size: 15, weight: .bold))
+                                        .foregroundColor(AdamTheme.textPrimary)
                                     Text(item.category)
                                         .font(.system(size: 12))
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(AdamTheme.textSecondary)
                                 }
 
                                 Spacer()
 
                                 Text(DataManager.formatMoney(item.price))
                                     .font(.system(size: 15, weight: .bold))
-                                    .foregroundColor(.green)
+                                    .foregroundColor(AdamTheme.green)
 
                                 Button(action: {
-                                    withAnimation {
-                                        dataManager.deleteMenuItem(id: item.id)
-                                    }
+                                    dataManager.deleteMenuItem(id: item.id)
                                 }) {
                                     Image(systemName: "trash")
-                                        .foregroundColor(.red.opacity(0.8))
+                                        .foregroundColor(AdamTheme.red.opacity(0.8))
                                         .padding(8)
                                 }
                             }
                             .padding(10)
-                            .background(Color(UIColor.secondarySystemBackground))
+                            .background(AdamTheme.bg)
                             .cornerRadius(10)
+                            .overlay(RoundedRectangle(cornerRadius: 10).stroke(AdamTheme.border, lineWidth: 1))
                         }
                     }
 
@@ -84,21 +82,23 @@ public struct SettingsAndBackupView: View {
                         dataManager.resetMenuToDefaults()
                     }
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.orange)
+                    .foregroundColor(AdamTheme.amber)
                     .padding(.top, 4)
                 }
                 .padding()
-                .background(Color(UIColor.systemBackground))
+                .background(AdamTheme.card)
                 .cornerRadius(16)
+                .overlay(RoundedRectangle(cornerRadius: 16).stroke(AdamTheme.border, lineWidth: 1))
 
                 // قسم النسخ الاحتياطي والأمان
                 VStack(alignment: .leading, spacing: 14) {
                     Text("النسخ الاحتياطي ونقل البيانات")
                         .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(AdamTheme.textPrimary)
 
-                    Text("بياناتك تُحفظ تلقائياً وبأمان في ذاكرة الآيباد بدون إنترنت. يمكنك تصدير نسخة احتياطية لحفظها في تطبيق «الملفات» أو نقلها لجهاز آخر.")
+                    Text("بياناتك تُحفظ تلقائياً وبأمان في ذاكرة الآيباد بدون إنترنت. اضغط على تصدير لحفظ نسخة فورية في تطبيق «الملفات» أو مشاركتها عبر تيليغرام أو واتساب.")
                         .font(.system(size: 13))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AdamTheme.textSecondary)
 
                     HStack(spacing: 12) {
                         Button(action: exportBackup) {
@@ -122,22 +122,22 @@ public struct SettingsAndBackupView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
-                            .background(Color(UIColor.secondarySystemBackground))
-                            .foregroundColor(.primary)
+                            .background(AdamTheme.bg)
+                            .foregroundColor(AdamTheme.textPrimary)
                             .cornerRadius(12)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(AdamTheme.border, lineWidth: 1))
                         }
                     }
 
                     if !importStatusMessage.isEmpty {
                         Text(importStatusMessage)
                             .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(.green)
+                            .foregroundColor(AdamTheme.green)
                             .padding(.top, 4)
                     }
 
-                    Divider()
+                    Divider().background(AdamTheme.border)
 
-                    // إحصاءات التخزين
                     HStack {
                         VStack(alignment: .leading, spacing: 4) {
                             Text("الطلبات المسجلة: \(dataManager.orders.count)")
@@ -145,18 +145,18 @@ public struct SettingsAndBackupView: View {
                             Text("أصناف المنيو: \(dataManager.menuItems.count)")
                         }
                         .font(.system(size: 13))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(AdamTheme.textSecondary)
                         Spacer()
                     }
                 }
                 .padding()
-                .background(Color(UIColor.systemBackground))
+                .background(AdamTheme.card)
                 .cornerRadius(16)
+                .overlay(RoundedRectangle(cornerRadius: 16).stroke(AdamTheme.border, lineWidth: 1))
             }
             .padding()
         }
-        .background(Color(UIColor.systemGroupedBackground))
-        // نافذة إضافة صنف جديد
+        .background(AdamTheme.bg)
         .sheet(isPresented: $showingAddAlert) {
             NavigationView {
                 Form {
@@ -175,7 +175,7 @@ public struct SettingsAndBackupView: View {
                                         Text(em)
                                             .font(.system(size: 32))
                                             .padding(6)
-                                            .background(newItemEmoji == em ? Color.orange.opacity(0.2) : Color.clear)
+                                            .background(newItemEmoji == em ? AdamTheme.amber.opacity(0.2) : Color.clear)
                                             .cornerRadius(8)
                                     }
                                 }
@@ -205,11 +205,6 @@ public struct SettingsAndBackupView: View {
             }
             .environment(\.layoutDirection, .rightToLeft)
         }
-        .sheet(isPresented: $showingShareSheet) {
-            if let url = backupFileURL {
-                ShareSheet(activityItems: [url])
-            }
-        }
         .sheet(isPresented: $showingFilePicker) {
             DocumentPicker { url in
                 if dataManager.importBackup(from: url) {
@@ -221,23 +216,28 @@ public struct SettingsAndBackupView: View {
         }
     }
 
+    // تصدير النسخة الاحتياطية المتوافق 100% مع شاشة الآيباد
     private func exportBackup() {
-        if let url = dataManager.exportBackupURL() {
-            backupFileURL = url
-            showingShareSheet = true
+        guard let url = dataManager.exportBackupURL() else { return }
+
+        guard let windowScene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene ?? UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootVC = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController ?? windowScene.windows.first?.rootViewController else {
+            return
         }
+
+        var topVC = rootVC
+        while let presented = topVC.presentedViewController {
+            topVC = presented
+        }
+
+        let activityVC = UIActivityViewController(activityItems: [url], applicationActivities: nil)
+        if let popover = activityVC.popoverPresentationController {
+            popover.sourceView = topVC.view
+            popover.sourceRect = CGRect(x: topVC.view.bounds.midX, y: topVC.view.bounds.midY, width: 0, height: 0)
+            popover.permittedArrowDirections = []
+        }
+        topVC.present(activityVC, animated: true, completion: nil)
     }
-}
-
-// عارض مشاركة الملفات (UIActivityViewController)
-struct ShareSheet: UIViewControllerRepresentable {
-    var activityItems: [Any]
-
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
-    }
-
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
 // منتقي الملفات للاستيراد

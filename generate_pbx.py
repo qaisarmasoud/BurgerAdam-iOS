@@ -21,6 +21,7 @@ def generate_pbxproj():
     # Source files
     files = [
         ("BurgerAdamApp.swift", "BurgerAdam/BurgerAdamApp.swift"),
+        ("Theme.swift", "BurgerAdam/Theme.swift"),
         ("MenuItem.swift", "BurgerAdam/Models/MenuItem.swift"),
         ("Order.swift", "BurgerAdam/Models/Order.swift"),
         ("Expense.swift", "BurgerAdam/Models/Expense.swift"),
