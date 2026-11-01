@@ -1,111 +1,99 @@
 import SwiftUI
 
-public enum ReportFilterMode: String, CaseIterable {
-    case currentShift = "اليوم / الشفت الحالي"
-    case yesterday = "أمس"
+public enum ReportTab: String, CaseIterable {
+    case active = "اليومية الحالية (شغال)"
+    case closed = "الأيام السابقة (الأرشيف)"
     case allTime = "الإجمالي الشامل (الكل)"
-    case custom = "تاريخ مخصص"
 }
 
 public struct ReportsView: View {
     @ObservedObject var dataManager: DataManager
-    @State private var filterMode: ReportFilterMode = .allTime // يبدأ افتراضياً على الإجمالي الشامل ليرى كل مبيعاته
-    @State private var selectedCustomDate: Date = DataManager.restaurantBusinessDate(for: Date())
+    @State private var currentTab: ReportTab = .active
+    @State private var showingCloseDayAlert = false
     @State private var selectedOrderForReceipt: Order?
 
-    private var targetDate: Date {
-        switch filterMode {
-        case .currentShift:
-            return DataManager.restaurantBusinessDate(for: Date())
-        case .yesterday:
-            return Calendar.current.date(byAdding: .day, value: -1, to: DataManager.restaurantBusinessDate(for: Date())) ?? Date()
-        case .custom:
-            return selectedCustomDate
+    private var currentOrders: [Order] {
+        switch currentTab {
+        case .active:
+            return dataManager.activeOrders
+        case .closed:
+            return dataManager.closedOrders
         case .allTime:
-            return Date()
-        }
-    }
-
-    private var displayedOrders: [Order] {
-        if filterMode == .allTime {
             return dataManager.orders
-        } else {
-            return dataManager.orders(for: targetDate)
         }
     }
 
-    private var displayedSales: Int {
-        if filterMode == .allTime {
+    private var currentSales: Int {
+        switch currentTab {
+        case .active:
+            return dataManager.activeSalesTotal
+        case .closed:
+            return dataManager.closedOrders.reduce(0) { $0 + $1.total }
+        case .allTime:
             return dataManager.allTimeSalesTotal
-        } else {
-            return dataManager.totalSales(for: targetDate)
         }
     }
 
-    private var displayedExpenses: Int {
-        if filterMode == .allTime {
-            return dataManager.allTimeExpensesTotal
-        } else {
-            return dataManager.totalExpenses(for: targetDate)
-        }
+    private var currentExpenses: Int {
+        dataManager.allTimeExpensesTotal // المصاريف تبقى ثابتة وتراكمية ولا تتصفر أبداً كما طلب المستخدم
     }
 
-    private var displayedNetProfit: Int {
-        displayedSales - displayedExpenses
+    private var currentNetProfit: Int {
+        currentSales - currentExpenses
     }
 
     public var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                // شريط تصفية التقارير (فلاتر واضحة ومباشرة)
-                VStack(spacing: 10) {
+                // شريط ترويسة التقارير وزر إغلاق اليومية
+                VStack(spacing: 12) {
                     HStack {
                         VStack(alignment: .leading, spacing: 3) {
                             Text("الأرباح والتقارير المالية")
                                 .font(.system(size: 21, weight: .black))
                                 .foregroundColor(AdamTheme.textPrimary)
-                            Text("اختر طريقة العرض لمتابعة أرباحك ومبيعاتك بدقة")
+                            Text("التحكم اليدوي باليومية وحساب صافي الأرباح")
                                 .font(.system(size: 13))
                                 .foregroundColor(AdamTheme.textSecondary)
                         }
                         Spacer()
+
+                        // زر إغلاق اليومية اليدوي الفوري
+                        Button(action: {
+                            showingCloseDayAlert = true
+                        }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "lock.shield.fill")
+                                Text("إغلاق اليومية وبدء يوم جديد")
+                            }
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 9)
+                            .background(AdamTheme.red)
+                            .cornerRadius(10)
+                        }
                     }
 
-                    // أزرار الفلاتر السريعة
-                    HStack(spacing: 6) {
-                        ForEach(ReportFilterMode.allCases, id: \.self) { mode in
+                    // أزرار التبديل بين اليومية الحالية والأرشيف والكل
+                    HStack(spacing: 8) {
+                        ForEach(ReportTab.allCases, id: \.self) { tab in
                             Button(action: {
-                                filterMode = mode
+                                currentTab = tab
                             }) {
-                                Text(mode.rawValue)
-                                    .font(.system(size: 12, weight: .bold))
-                                    .padding(.horizontal, 10)
+                                Text(tab.rawValue)
+                                    .font(.system(size: 13, weight: .bold))
+                                    .frame(maxWidth: .infinity)
                                     .padding(.vertical, 8)
-                                    .background(filterMode == mode ? AdamTheme.amber : AdamTheme.bg)
-                                    .foregroundColor(filterMode == mode ? .black : AdamTheme.textPrimary)
+                                    .background(currentTab == tab ? AdamTheme.amber : AdamTheme.bg)
+                                    .foregroundColor(currentTab == tab ? .black : AdamTheme.textPrimary)
                                     .cornerRadius(10)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 10)
-                                            .stroke(filterMode == mode ? AdamTheme.amber : AdamTheme.border, lineWidth: 1)
+                                            .stroke(currentTab == tab ? AdamTheme.amber : AdamTheme.border, lineWidth: 1)
                                     )
                             }
                         }
-                    }
-
-                    // اختيار تاريخ مخصص إذا تم اختياره
-                    if filterMode == .custom {
-                        HStack {
-                            Text("حدد التاريخ:")
-                                .font(.system(size: 13, weight: .bold))
-                                .foregroundColor(AdamTheme.textSecondary)
-                            Spacer()
-                            DatePicker("", selection: $selectedCustomDate, displayedComponents: .date)
-                                .labelsHidden()
-                                .padding(6)
-                                .background(AdamTheme.bg)
-                                .cornerRadius(8)
-                        }
-                        .padding(.top, 4)
                     }
                 }
                 .padding()
@@ -113,56 +101,64 @@ public struct ReportsView: View {
                 .cornerRadius(16)
                 .overlay(RoundedRectangle(cornerRadius: 16).stroke(AdamTheme.border, lineWidth: 1))
 
-                // بطاقات الإحصاءات الثلاثية
+                // بطاقات الإحصاءات الثلاثية (المبيعات - المصاريف = صافي الربح)
                 HStack(spacing: 12) {
                     StatCard(
-                        title: "إجمالي المبيعات",
-                        value: DataManager.formatMoney(displayedSales),
-                        subtitle: "\(displayedOrders.count) طلبات مسجلة",
+                        title: currentTab == .active ? "مبيعات اليومية الحالية" : "إجمالي المبيعات",
+                        value: DataManager.formatMoney(currentSales),
+                        subtitle: "\(currentOrders.count) طلبات",
                         icon: "bag.fill",
                         color: AdamTheme.green
                     )
 
                     StatCard(
-                        title: "إجمالي المصاريف",
-                        value: DataManager.formatMoney(displayedExpenses),
-                        subtitle: filterMode == .allTime ? "\(dataManager.expenses.count) مصروفات" : "\(dataManager.expenses(for: targetDate).count) مصروفات",
+                        title: "إجمالي المصاريف (ثابت)",
+                        value: DataManager.formatMoney(currentExpenses),
+                        subtitle: "\(dataManager.expenses.count) مشتريات (لا تتصفر)",
                         icon: "arrow.down.right.circle.fill",
                         color: AdamTheme.red
                     )
 
                     StatCard(
                         title: "صافي الأرباح",
-                        value: DataManager.formatMoney(displayedNetProfit),
-                        subtitle: displayedNetProfit >= 0 ? "أرباح صافية 🎉" : "عجز مالي",
-                        icon: displayedNetProfit >= 0 ? "chart.line.uptrend.xyaxis" : "chart.line.downtrend.xyaxis",
-                        color: displayedNetProfit >= 0 ? AdamTheme.green : AdamTheme.red
+                        value: DataManager.formatMoney(currentNetProfit),
+                        subtitle: currentNetProfit >= 0 ? "أرباح إيجابية 🎉" : "عجز مصاريف",
+                        icon: currentNetProfit >= 0 ? "chart.line.uptrend.xyaxis" : "chart.line.downtrend.xyaxis",
+                        color: currentNetProfit >= 0 ? AdamTheme.green : AdamTheme.red
                     )
                 }
 
-                // قائمة المبيعات المفلترة
+                // قائمة الطلبات
                 VStack(alignment: .leading, spacing: 12) {
                     HStack {
-                        Text(filterMode == .allTime ? "جميع المبيعات المسجلة" : "مبيعات الفترة المحددة")
+                        Text(currentTab == .active ? "طلبات اليومية الحالية (قيد العمل)" : (currentTab == .closed ? "سجل الأيام السابقة المغلقة" : "جميع الطلبات المسجلة"))
                             .font(.system(size: 17, weight: .bold))
                             .foregroundColor(AdamTheme.textPrimary)
                         Spacer()
-                        Text("\(displayedOrders.count) طلب")
+                        Text("\(currentOrders.count) طلب")
                             .font(.system(size: 13, weight: .bold))
                             .foregroundColor(AdamTheme.textSecondary)
                     }
 
-                    if displayedOrders.isEmpty {
-                        HStack {
-                            Spacer()
-                            Text("لا توجد مبيعات في هذا التاريخ.")
+                    if currentOrders.isEmpty {
+                        VStack(spacing: 8) {
+                            Text(currentTab == .active ? "اليومية الحالية فارغة أو تم إغلاقها حديثاً." : "لا توجد طلبات في هذا القسم.")
                                 .foregroundColor(AdamTheme.textSecondary)
-                                .padding(.vertical, 24)
-                            Spacer()
+                                .font(.system(size: 14))
+
+                            if currentTab == .active && !dataManager.closedOrders.isEmpty {
+                                Button("عرض طلبات الأيام السابقة المغلقة") {
+                                    currentTab = .closed
+                                }
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(AdamTheme.amber)
+                            }
                         }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 28)
                     } else {
                         VStack(spacing: 8) {
-                            ForEach(displayedOrders) { order in
+                            ForEach(currentOrders) { order in
                                 HStack {
                                     VStack(alignment: .leading, spacing: 4) {
                                         HStack(spacing: 6) {
@@ -186,6 +182,15 @@ public struct ReportsView: View {
                                                 .background(AdamTheme.green.opacity(0.15))
                                                 .foregroundColor(AdamTheme.green)
                                                 .cornerRadius(6)
+                                            if order.isClosed ?? false {
+                                                Text("مغلق")
+                                                    .font(.system(size: 10, weight: .bold))
+                                                    .padding(.horizontal, 5)
+                                                    .padding(.vertical, 2)
+                                                    .background(Color.gray.opacity(0.2))
+                                                    .foregroundColor(.gray)
+                                                    .cornerRadius(4)
+                                            }
                                         }
 
                                         Text(order.items.map { "\($0.name) × \($0.quantity)" }.joined(separator: " ، "))
@@ -240,6 +245,17 @@ public struct ReportsView: View {
             .padding()
         }
         .background(AdamTheme.bg)
+        .alert(isPresented: $showingCloseDayAlert) {
+            Alert(
+                title: Text("إغلاق اليومية"),
+                message: Text("هل أنت متأكد أنك تريد إغلاق يوم العمل الحالي؟\nسيتم أرشفة المبيعات والبدء بيوم جديد."),
+                primaryButton: .destructive(Text("نعم، إغلاق وبدء يوم جديد")) {
+                    dataManager.closeCurrentDay()
+                    currentTab = .closed
+                },
+                secondaryButton: .cancel(Text("إلغاء"))
+            )
+        }
         .sheet(item: $selectedOrderForReceipt) { order in
             ReceiptView(order: order)
         }
@@ -275,13 +291,13 @@ public struct StatCard: View {
             }
 
             Text(value)
-                .font(.system(size: 21, weight: .black))
+                .font(.system(size: 20, weight: .black))
                 .foregroundColor(color)
-                .minimumScaleFactor(0.8)
+                .minimumScaleFactor(0.75)
                 .lineLimit(1)
 
             Text(subtitle)
-                .font(.system(size: 12))
+                .font(.system(size: 11))
                 .foregroundColor(AdamTheme.textSecondary)
         }
         .padding(14)

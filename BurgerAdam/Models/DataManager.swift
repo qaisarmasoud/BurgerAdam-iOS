@@ -27,16 +27,6 @@ public class DataManager: ObservableObject {
         return "\(formatted) د.ع"
     }
 
-    // حساب يوم عمل المطعم (إذا كان الوقت بعد منتصف الليل وقبل 4:30 فجراً، يُعتبر تابعاً لشفت ليلة الأمس)
-    public static func restaurantBusinessDate(for date: Date = Date()) -> Date {
-        let calendar = Calendar.current
-        let hour = calendar.component(.hour, from: date)
-        if hour < 4 { // بين 12 ليلاً و 4 صباحاً
-            return calendar.date(byAdding: .day, value: -1, to: date) ?? date
-        }
-        return date
-    }
-
     public func loadAllData() {
         let decoder = JSONDecoder()
 
@@ -50,7 +40,7 @@ public class DataManager: ObservableObject {
             saveMenu()
         }
 
-        // 2. تحميل الطلبات (مع حماية واسترجاع من الذاكرة الاحتياطية إن وُجدت)
+        // 2. تحميل الطلبات
         let ordersURL = documentsDirectory.appendingPathComponent(ordersFileName)
         if let data = try? Data(contentsOf: ordersURL),
            let decoded = try? decoder.decode([Order].self, from: data) {
@@ -89,7 +79,6 @@ public class DataManager: ObservableObject {
         if let encoded = try? encoder.encode(orders) {
             let ordersURL = documentsDirectory.appendingPathComponent(ordersFileName)
             try? encoded.write(to: ordersURL, options: .atomic)
-            // حفظ نسخة احتياطية إضافية فورية في UserDefaults لضمان عدم الضياع نهائياً
             UserDefaults.standard.set(encoded, forKey: "adam_orders_backup")
         }
     }
@@ -113,7 +102,8 @@ public class DataManager: ObservableObject {
             note: note,
             orderType: orderType,
             paymentMethod: paymentMethod,
-            total: total
+            total: total,
+            isClosed: false
         )
         orders.insert(newOrder, at: 0)
         saveOrders()
@@ -152,48 +142,62 @@ public class DataManager: ObservableObject {
         saveMenu()
     }
 
-    // فلترة الطلبات والمصاريف بحسب يوم عمل المطعم
-    public func orders(for date: Date) -> [Order] {
-        let calendar = Calendar.current
-        return orders.filter { order in
-            let orderBizDate = DataManager.restaurantBusinessDate(for: order.date)
-            let targetBizDate = DataManager.restaurantBusinessDate(for: date)
-            return calendar.isDate(orderBizDate, inSameDayAs: targetBizDate)
-        }
+    // --- منطق اليومية والشفت اليدوي بدون أي تصفير زمني تلقائي ---
+
+    // طلبات اليومية الحالية (التي لم يتم إغلاقها يدوياً بعد)
+    public var activeOrders: [Order] {
+        orders.filter { !($0.isClosed ?? false) }
     }
 
-    public func expenses(for date: Date) -> [Expense] {
-        let calendar = Calendar.current
-        return expenses.filter { exp in
-            let expBizDate = DataManager.restaurantBusinessDate(for: exp.date)
-            let targetBizDate = DataManager.restaurantBusinessDate(for: date)
-            return calendar.isDate(expBizDate, inSameDayAs: targetBizDate)
-        }
+    // الطلبات المغلقة سابقاً
+    public var closedOrders: [Order] {
+        orders.filter { ($0.isClosed ?? false) }
     }
 
-    public func totalSales(for date: Date) -> Int {
-        orders(for: date).reduce(0) { $0 + $1.total }
+    // مبيعات اليومية الحالية
+    public var activeSalesTotal: Int {
+        activeOrders.reduce(0) { $0 + $1.total }
     }
 
-    public func totalExpenses(for date: Date) -> Int {
-        expenses(for: date).reduce(0) { $0 + $1.amount }
-    }
-
-    public func netProfit(for date: Date) -> Int {
-        totalSales(for: date) - totalExpenses(for: date)
-    }
-
-    // الإجماليات الشاملة لكل الأوقات (All-Time)
+    // إجمالي المبيعات الشامل لكل الطلبات
     public var allTimeSalesTotal: Int {
         orders.reduce(0) { $0 + $1.total }
     }
 
+    // إجمالي المصاريف الكلية الثابتة (لا تتصفر أبداً)
     public var allTimeExpensesTotal: Int {
         expenses.reduce(0) { $0 + $1.amount }
     }
 
+    // صافي الربح التراكمي (إجمالي المبيعات - إجمالي المصاريف)
     public var allTimeNetProfit: Int {
         allTimeSalesTotal - allTimeExpensesTotal
+    }
+
+    // صافي ربح اليومية الحالية (مبيعات اليومية الحالية - إجمالي المصاريف)
+    public var activeNetProfit: Int {
+        activeSalesTotal - allTimeExpensesTotal
+    }
+
+    // إغلاق اليومية الحالية يدوياً وبدء يوم جديد
+    public func closeCurrentDay() {
+        let now = Date()
+        for i in 0..<orders.count {
+            if !(orders[i].isClosed ?? false) {
+                orders[i].isClosed = true
+                orders[i].closedDate = now
+            }
+        }
+        saveOrders()
+    }
+
+    // إعادة فتح آخر يومية في حال أغلقت بالخطأ
+    public func reopenLastDay() {
+        for i in 0..<orders.count {
+            orders[i].isClosed = false
+            orders[i].closedDate = nil
+        }
+        saveOrders()
     }
 
     // تصدير واستيراد النسخة الاحتياطية
@@ -209,7 +213,7 @@ public class DataManager: ObservableObject {
     public func exportBackupURL() -> URL? {
         let backup = BackupData(
             app: "بركر ادم",
-            version: 3,
+            version: 4,
             exportedAt: Date(),
             menu: menuItems,
             orders: orders,

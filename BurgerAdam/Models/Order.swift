@@ -41,6 +41,8 @@ public struct Order: Identifiable, Codable, Equatable {
     public var orderType: OrderType
     public var paymentMethod: PaymentMethod
     public var total: Int
+    public var isClosed: Bool? // هل أُغلقت اليومية الخاصة بهذا الطلب
+    public var closedDate: Date?
 
     public init(
         id: UUID = UUID(),
@@ -50,7 +52,9 @@ public struct Order: Identifiable, Codable, Equatable {
         note: String = "",
         orderType: OrderType = .takeaway,
         paymentMethod: PaymentMethod = .cash,
-        total: Int
+        total: Int,
+        isClosed: Bool? = false,
+        closedDate: Date? = nil
     ) {
         self.id = id
         self.orderNumber = orderNumber
@@ -60,5 +64,7 @@ public struct Order: Identifiable, Codable, Equatable {
         self.orderType = orderType
         self.paymentMethod = paymentMethod
         self.total = total
+        self.isClosed = isClosed
+        self.closedDate = closedDate
     }
 }

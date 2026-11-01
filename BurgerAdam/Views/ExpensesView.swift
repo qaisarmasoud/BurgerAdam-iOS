@@ -7,19 +7,6 @@ public struct ExpensesView: View {
     @State private var selectedCategory: String = "مواد غذائية (لحوم، خبز)"
     @State private var date: Date = Date()
     @State private var note: String = ""
-    @State private var showAllExpenses: Bool = true // افتراضياً يعرض كل المصاريف لكي لا يختفي أي رقم
-
-    private var todayExpensesTotal: Int {
-        dataManager.totalExpenses(for: Date())
-    }
-
-    private var displayedExpensesList: [Expense] {
-        if showAllExpenses {
-            return dataManager.expenses
-        } else {
-            return dataManager.expenses(for: Date())
-        }
-    }
 
     public var body: some View {
         HStack(spacing: 0) {
@@ -116,69 +103,45 @@ public struct ExpensesView: View {
 
             // قائمة المصاريف السابقة
             VStack(spacing: 0) {
-                // شريط إحصائيات المصاريف الثنائية (الشفت الحالي + الإجمالي الكلي)
-                HStack(spacing: 12) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("إجمالي المصاريف الكلية:")
-                            .font(.system(size: 12))
+                // شريط إجمالي المصاريف الكلية الثابت (لا يتصفر أبداً)
+                HStack {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("إجمالي المصاريف المسجلة (تراكمي دائم):")
+                            .font(.system(size: 13, weight: .bold))
                             .foregroundColor(AdamTheme.textSecondary)
                         Text(DataManager.formatMoney(dataManager.allTimeExpensesTotal))
-                            .font(.system(size: 19, weight: .black))
+                            .font(.system(size: 22, weight: .black))
                             .foregroundColor(AdamTheme.red)
                     }
-                    .padding(10)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(AdamTheme.bg)
-                    .cornerRadius(10)
-                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(AdamTheme.border, lineWidth: 1))
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("مصاريف شفت اليوم:")
-                            .font(.system(size: 12))
-                            .foregroundColor(AdamTheme.textSecondary)
-                        Text(DataManager.formatMoney(todayExpensesTotal))
-                            .font(.system(size: 19, weight: .black))
-                            .foregroundColor(AdamTheme.amber)
-                    }
-                    .padding(10)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(AdamTheme.bg)
-                    .cornerRadius(10)
-                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(AdamTheme.border, lineWidth: 1))
-
-                    // زر التبديل بين الكل واليوم
-                    Button(action: {
-                        showAllExpenses.toggle()
-                    }) {
-                        Text(showAllExpenses ? "عرض: الكل" : "عرض: اليوم")
-                            .font(.system(size: 12, weight: .bold))
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 8)
-                            .background(AdamTheme.bg)
-                            .foregroundColor(AdamTheme.textPrimary)
-                            .cornerRadius(8)
-                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(AdamTheme.border, lineWidth: 1))
-                    }
+                    Spacer()
+                    Text("\(dataManager.expenses.count) مشتريات محفوظة")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(AdamTheme.textPrimary)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(AdamTheme.bg)
+                        .cornerRadius(8)
+                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(AdamTheme.border, lineWidth: 1))
                 }
                 .padding()
                 .background(AdamTheme.card)
 
                 Divider().background(AdamTheme.border)
 
-                if displayedExpensesList.isEmpty {
+                if dataManager.expenses.isEmpty {
                     VStack(spacing: 12) {
                         Spacer()
                         Image(systemName: "tray")
                             .font(.system(size: 46))
                             .foregroundColor(AdamTheme.textSecondary.opacity(0.4))
-                        Text("لا توجد مصاريف مسجلة")
+                        Text("لا توجد مصاريف مسجلة حتى الآن")
                             .font(.system(size: 15, weight: .bold))
                             .foregroundColor(AdamTheme.textSecondary)
                         Spacer()
                     }
                 } else {
                     List {
-                        ForEach(displayedExpensesList) { exp in
+                        ForEach(dataManager.expenses) { exp in
                             HStack {
                                 VStack(alignment: .leading, spacing: 3) {
                                     Text(exp.name)

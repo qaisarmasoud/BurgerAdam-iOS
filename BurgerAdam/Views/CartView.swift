@@ -46,7 +46,7 @@ public struct CartView: View {
 
             // شريط إحصائي سريع للكاشير
             HStack {
-                Text("شفت اليوم: \(DataManager.formatMoney(dataManager.totalSales(for: Date()))) (\(dataManager.orders(for: Date()).count) طلب)")
+                Text("اليومية الحالية: \(DataManager.formatMoney(dataManager.activeSalesTotal)) (\(dataManager.activeOrders.count) طلب)")
                     .font(.system(size: 11, weight: .bold))
                     .foregroundColor(AdamTheme.green)
                 Spacer()
