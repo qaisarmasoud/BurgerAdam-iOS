@@ -1,5 +1,11 @@
 import SwiftUI
 
+public enum ExpenseTab: String, CaseIterable {
+    case active = "اليومية الحالية (شغال)"
+    case closed = "الأيام السابقة (الأرشيف)"
+    case allTime = "الإجمالي الشامل (الكل)"
+}
+
 public struct ExpensesView: View {
     @ObservedObject var dataManager: DataManager
     @State private var name: String = ""
@@ -7,6 +13,29 @@ public struct ExpensesView: View {
     @State private var selectedCategory: String = "مواد غذائية (لحوم، خبز)"
     @State private var date: Date = Date()
     @State private var note: String = ""
+    @State private var currentTab: ExpenseTab = .active
+
+    private var displayedExpenses: [Expense] {
+        switch currentTab {
+        case .active:
+            return dataManager.activeExpenses
+        case .closed:
+            return dataManager.closedExpenses
+        case .allTime:
+            return dataManager.expenses
+        }
+    }
+
+    private var currentTotalAmount: Int {
+        switch currentTab {
+        case .active:
+            return dataManager.activeExpensesTotal
+        case .closed:
+            return dataManager.closedExpenses.reduce(0) { $0 + $1.amount }
+        case .allTime:
+            return dataManager.allTimeExpensesTotal
+        }
+    }
 
     public var body: some View {
         HStack(spacing: 0) {
@@ -101,52 +130,98 @@ public struct ExpensesView: View {
 
             Divider().background(AdamTheme.border)
 
-            // قائمة المصاريف السابقة
+            // قائمة المصاريف مع التبويب
             VStack(spacing: 0) {
-                // شريط إجمالي المصاريف الكلية الثابت (لا يتصفر أبداً)
-                HStack {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("إجمالي المصاريف المسجلة (تراكمي دائم):")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(AdamTheme.textSecondary)
-                        Text(DataManager.formatMoney(dataManager.allTimeExpensesTotal))
-                            .font(.system(size: 22, weight: .black))
-                            .foregroundColor(AdamTheme.red)
+                // شريط إحصائي أعلى القائمة
+                VStack(spacing: 12) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(currentTab == .active ? "مصاريف اليومية الحالية (شغال):" : (currentTab == .closed ? "مصاريف الأيام السابقة (الأرشيف):" : "إجمالي المصاريف الشامل:"))
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(AdamTheme.textSecondary)
+                            Text(DataManager.formatMoney(currentTotalAmount))
+                                .font(.system(size: 22, weight: .black))
+                                .foregroundColor(AdamTheme.red)
+                        }
+                        Spacer()
+                        VStack(alignment: .trailing, spacing: 4) {
+                            Text("\(displayedExpenses.count) مشتريات")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(AdamTheme.textPrimary)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 5)
+                                .background(AdamTheme.bg)
+                                .cornerRadius(8)
+                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(AdamTheme.border, lineWidth: 1))
+
+                            if currentTab == .active {
+                                Text("الإجمالي التراكمي: \(DataManager.formatMoney(dataManager.allTimeExpensesTotal))")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(AdamTheme.textSecondary)
+                            }
+                        }
                     }
-                    Spacer()
-                    Text("\(dataManager.expenses.count) مشتريات محفوظة")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(AdamTheme.textPrimary)
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
-                        .background(AdamTheme.bg)
-                        .cornerRadius(8)
-                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(AdamTheme.border, lineWidth: 1))
+
+                    // أزرار التبديل بين التبويبات
+                    HStack(spacing: 8) {
+                        ForEach(ExpenseTab.allCases, id: \.self) { tab in
+                            Button(action: {
+                                currentTab = tab
+                            }) {
+                                Text(tab.rawValue)
+                                    .font(.system(size: 13, weight: currentTab == tab ? .black : .medium))
+                                    .foregroundColor(currentTab == tab ? .white : AdamTheme.textSecondary)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 7)
+                                    .background(currentTab == tab ? AdamTheme.red : AdamTheme.bg)
+                                    .cornerRadius(8)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(currentTab == tab ? Color.clear : AdamTheme.border, lineWidth: 1)
+                                    )
+                            }
+                        }
+                        Spacer()
+                    }
                 }
                 .padding()
                 .background(AdamTheme.card)
 
                 Divider().background(AdamTheme.border)
 
-                if dataManager.expenses.isEmpty {
+                if displayedExpenses.isEmpty {
                     VStack(spacing: 12) {
                         Spacer()
                         Image(systemName: "tray")
                             .font(.system(size: 46))
                             .foregroundColor(AdamTheme.textSecondary.opacity(0.4))
-                        Text("لا توجد مصاريف مسجلة حتى الآن")
-                            .font(.system(size: 15, weight: .bold))
+                        Text(currentTab == .active ? "لا توجد مصاريف لليومية الحالية حتى الآن\n(سجل مصروفاً جديداً من النموذج على اليمين)" : (currentTab == .closed ? "لا توجد مصاريف سابقة مؤرشفة" : "لا توجد أي مصاريف مسجلة"))
+                            .font(.system(size: 14, weight: .bold))
+                            .multilineTextAlignment(.center)
                             .foregroundColor(AdamTheme.textSecondary)
                         Spacer()
                     }
                 } else {
                     List {
-                        ForEach(dataManager.expenses) { exp in
+                        ForEach(displayedExpenses) { exp in
                             HStack {
                                 VStack(alignment: .leading, spacing: 3) {
-                                    Text(exp.name)
-                                        .font(.system(size: 15, weight: .bold))
-                                        .foregroundColor(AdamTheme.textPrimary)
+                                    HStack(spacing: 6) {
+                                        Text(exp.name)
+                                            .font(.system(size: 15, weight: .bold))
+                                            .foregroundColor(AdamTheme.textPrimary)
+
+                                        if exp.isClosed ?? false {
+                                            Text("مؤرشف")
+                                                .font(.system(size: 10, weight: .bold))
+                                                .padding(.horizontal, 5)
+                                                .padding(.vertical, 2)
+                                                .background(Color.gray.opacity(0.2))
+                                                .foregroundColor(.gray)
+                                                .cornerRadius(4)
+                                        }
+                                    }
+
                                     HStack(spacing: 8) {
                                         Text(exp.category)
                                             .font(.system(size: 11, weight: .bold))
@@ -207,5 +282,6 @@ public struct ExpensesView: View {
         name = ""
         amountString = ""
         note = ""
+        currentTab = .active
     }
 }

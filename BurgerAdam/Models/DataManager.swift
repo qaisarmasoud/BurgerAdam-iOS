@@ -32,7 +32,8 @@ public class DataManager: ObservableObject {
 
         // 1. تحميل المنيو
         let menuURL = documentsDirectory.appendingPathComponent(menuFileName)
-        if let data = try? Data(contentsOf: menuURL),
+        if FileManager.default.fileExists(atPath: menuURL.path),
+           let data = try? Data(contentsOf: menuURL),
            let decoded = try? decoder.decode([MenuItem].self, from: data) {
             self.menuItems = decoded
         } else {
@@ -42,7 +43,8 @@ public class DataManager: ObservableObject {
 
         // 2. تحميل الطلبات
         let ordersURL = documentsDirectory.appendingPathComponent(ordersFileName)
-        if let data = try? Data(contentsOf: ordersURL),
+        if FileManager.default.fileExists(atPath: ordersURL.path),
+           let data = try? Data(contentsOf: ordersURL),
            let decoded = try? decoder.decode([Order].self, from: data) {
             self.orders = decoded
         } else if let savedData = UserDefaults.standard.data(forKey: "adam_orders_backup"),
@@ -53,9 +55,10 @@ public class DataManager: ObservableObject {
             self.orders = []
         }
 
-        // 3. تحميل المصاريف
+        // 3. تحميل المصاريف (بدون استرجاع أي عناصر محذوفة)
         let expensesURL = documentsDirectory.appendingPathComponent(expensesFileName)
-        if let data = try? Data(contentsOf: expensesURL),
+        if FileManager.default.fileExists(atPath: expensesURL.path),
+           let data = try? Data(contentsOf: expensesURL),
            let decoded = try? decoder.decode([Expense].self, from: data) {
             self.expenses = decoded
         } else if let savedData = UserDefaults.standard.data(forKey: "adam_expenses_backup"),
@@ -116,7 +119,14 @@ public class DataManager: ObservableObject {
     }
 
     public func addExpense(name: String, amount: Int, category: String, date: Date, note: String) {
-        let expense = Expense(name: name, amount: amount, category: category, date: date, note: note)
+        let expense = Expense(
+            name: name,
+            amount: amount,
+            category: category,
+            date: date,
+            note: note,
+            isClosed: false
+        )
         expenses.insert(expense, at: 0)
         saveExpenses()
     }
@@ -142,16 +152,26 @@ public class DataManager: ObservableObject {
         saveMenu()
     }
 
-    // --- منطق اليومية والشفت اليدوي بدون أي تصفير زمني تلقائي ---
+    // --- منطق اليومية الحالية والأرشيف (يدوي بالكامل وبدون أي تصفير زمني) ---
 
-    // طلبات اليومية الحالية (التي لم يتم إغلاقها يدوياً بعد)
+    // 1. طلبات اليومية الحالية المفتوحة
     public var activeOrders: [Order] {
         orders.filter { !($0.isClosed ?? false) }
     }
 
-    // الطلبات المغلقة سابقاً
+    // الطلبات السابقة المؤرشفة
     public var closedOrders: [Order] {
         orders.filter { ($0.isClosed ?? false) }
+    }
+
+    // 2. مصاريف اليومية الحالية المفتوحة (التي سجلت لهذا اليوم فقط)
+    public var activeExpenses: [Expense] {
+        expenses.filter { !($0.isClosed ?? false) }
+    }
+
+    // المصاريف السابقة المؤرشفة
+    public var closedExpenses: [Expense] {
+        expenses.filter { ($0.isClosed ?? false) }
     }
 
     // مبيعات اليومية الحالية
@@ -159,27 +179,31 @@ public class DataManager: ObservableObject {
         activeOrders.reduce(0) { $0 + $1.total }
     }
 
-    // إجمالي المبيعات الشامل لكل الطلبات
+    // مصاريف اليومية الحالية (خاصة بهذا اليوم فقط ولا تعود مصاريف الأمس)
+    public var activeExpensesTotal: Int {
+        activeExpenses.reduce(0) { $0 + $1.amount }
+    }
+
+    // صافي ربح اليومية الحالية (مبيعات اليوم - مصاريف اليوم)
+    public var activeNetProfit: Int {
+        activeSalesTotal - activeExpensesTotal
+    }
+
+    // الإجماليات الشاملة التراكمية (لكل الأيام منذ بداية التطبيق)
     public var allTimeSalesTotal: Int {
         orders.reduce(0) { $0 + $1.total }
     }
 
-    // إجمالي المصاريف الكلية الثابتة (لا تتصفر أبداً)
     public var allTimeExpensesTotal: Int {
         expenses.reduce(0) { $0 + $1.amount }
     }
 
-    // صافي الربح التراكمي (إجمالي المبيعات - إجمالي المصاريف)
     public var allTimeNetProfit: Int {
         allTimeSalesTotal - allTimeExpensesTotal
     }
 
-    // صافي ربح اليومية الحالية (مبيعات اليومية الحالية - إجمالي المصاريف)
-    public var activeNetProfit: Int {
-        activeSalesTotal - allTimeExpensesTotal
-    }
-
-    // إغلاق اليومية الحالية يدوياً وبدء يوم جديد
+    // إغلاق اليومية الحالية (عندما يعزل صاحب المطعم)
+    // يُقفل مبيعات ومصاريف هذا اليوم معاً ويحفظهما في الأرشيف، لتبدأ اليومية الجديدة نظيفة بـ 0
     public func closeCurrentDay() {
         let now = Date()
         for i in 0..<orders.count {
@@ -188,16 +212,14 @@ public class DataManager: ObservableObject {
                 orders[i].closedDate = now
             }
         }
-        saveOrders()
-    }
-
-    // إعادة فتح آخر يومية في حال أغلقت بالخطأ
-    public func reopenLastDay() {
-        for i in 0..<orders.count {
-            orders[i].isClosed = false
-            orders[i].closedDate = nil
+        for i in 0..<expenses.count {
+            if !(expenses[i].isClosed ?? false) {
+                expenses[i].isClosed = true
+                expenses[i].closedDate = now
+            }
         }
         saveOrders()
+        saveExpenses()
     }
 
     // تصدير واستيراد النسخة الاحتياطية
@@ -213,7 +235,7 @@ public class DataManager: ObservableObject {
     public func exportBackupURL() -> URL? {
         let backup = BackupData(
             app: "بركر ادم",
-            version: 4,
+            version: 5,
             exportedAt: Date(),
             menu: menuItems,
             orders: orders,

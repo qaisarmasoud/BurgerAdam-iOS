@@ -7,6 +7,8 @@ public struct Expense: Identifiable, Codable, Equatable {
     public var category: String
     public var date: Date
     public var note: String
+    public var isClosed: Bool?
+    public var closedDate: Date?
 
     public init(
         id: UUID = UUID(),
@@ -14,7 +16,9 @@ public struct Expense: Identifiable, Codable, Equatable {
         amount: Int,
         category: String = "مواد غذائية",
         date: Date = Date(),
-        note: String = ""
+        note: String = "",
+        isClosed: Bool? = false,
+        closedDate: Date? = nil
     ) {
         self.id = id
         self.name = name
@@ -22,6 +26,8 @@ public struct Expense: Identifiable, Codable, Equatable {
         self.category = category
         self.date = date
         self.note = note
+        self.isClosed = isClosed
+        self.closedDate = closedDate
     }
 
     public static let categories = [
